@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+// generator erd {
+//   provider = "prisma-erd-generator"
+// }
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model account {
+  id      Int       @id @default(autoincrement())
+  name    String
+  fav     fav[]
+  roadmap roadmap[]
+  history history[]
+}
+
+model history {
+  id        Int       @id @default(autoincrement())
+  account   account   @relation(fields: [accountId], references: [id])
+  roadmap   roadmap   @relation(fields: [roadmapId], references: [id])
+  roadmapId Int
+  accountId Int
+  visited   visited[]
+}
+
+model fav {
+  id         Int      @id @default(autoincrement())
+  account    account  @relation(fields: [account_id], references: [id])
+  account_id Int
+  roadmap    roadmap  @relation(fields: [roadmapId], references: [id])
+  created_at DateTime
+  roadmapId  Int
+}
+
+model roadmap {
+  id        Int       @id @default(autoincrement())
+  node      node[]
+  arrow     arrow[]
+  account   account   @relation(fields: [accountId], references: [id])
+  accountId Int
+  title     String
+  summary   String
+  history   history[]
+  fav       fav[]
+}
+
+model node {
+  id             Int       @default(autoincrement())
+  title          String
+  summary        String
+  x              Int
+  y              Int
+  url            String
+  video_from_sec Int?
+  video_to_sec   Int?
+  roadmap        roadmap   @relation(fields: [roadmapId], references: [id])
+  roadmapId      Int
+  visited        visited[]
+
+  @@id([id, roadmapId])
+}
+
+model arrow {
+  id        Int     @default(autoincrement())
+  from_node Int
+  to_node   Int
+  roadmap   roadmap @relation(fields: [roadmapId], references: [id])
+  roadmapId Int
+  dashed    Boolean
+
+  @@id([id, roadmapId])
+}
+
+model visited {
+  id        Int      @id @default(autoincrement())
+  history   history? @relation(fields: [historyId], references: [id])
+  historyId Int?
+
+  node          node? @relation(fields: [nodeId, nodeRoadmapId], references: [id, roadmapId])
+  nodeId        Int?
+  nodeRoadmapId Int?
+}
