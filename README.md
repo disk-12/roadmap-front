@@ -32,21 +32,19 @@ yarn dev
 - 必要に応じて
 
 ```bash
-cp .env.example
+cp .env.example .env
 ```
 
 ### openapi generate
 
-- あとで書く
-
-<hr />
+```bash
+yarn openapi:g
+```
 
 ## ディレクトリ構成
 
 - atomic 不採用 (極力切り出しは避ける？)
 - あとで真面目に書く
-
-<hr />
 
 ## バックエンド系接続イメージ
 
