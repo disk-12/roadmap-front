@@ -9,7 +9,8 @@
     "lint": "next lint",
     "prisma:migrate": "prisma migrate dev --name init",
     "prisma:generate": "prisma generate",
-    "format": "prettier src --write"
+    "format": "prettier src --write",
+    "openapi:g": "openapi-typescript openapi.json --output src/schema.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.9.3",
@@ -34,6 +35,7 @@
     "@types/react-dom": "18.0.5",
     "eslint": "8.17.0",
     "eslint-config-next": "12.1.6",
+    "openapi-typescript": "^5.4.0",
     "prettier": "^2.6.2",
     "prisma": "^3.15.1",
     "prisma-erd-generator": "^0.11.4",
