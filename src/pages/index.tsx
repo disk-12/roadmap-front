@@ -1,16 +1,14 @@
-import axios from 'axios'
 import { Box } from '@mui/system'
 import { Tab, Tabs } from '@mui/material'
 import type { NextPage } from 'next'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { RoadmapCard } from 'components/RoadmapCard'
-import { paths } from 'schema'
 import { request } from 'schemaHelper'
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState(0)
-  const { data, isLoading } = useQuery('/home_timeline', () =>
+  const { data } = useQuery('/home_timeline', () =>
     request({ url: '/home_timeline', method: 'get' }).then(({ data }) => data)
   )
 
@@ -38,10 +36,3 @@ const Home: NextPage = () => {
 }
 
 export default Home
-
-type Data = {
-  id: number
-  title: string
-  summary: string
-  imgurl?: string
-}

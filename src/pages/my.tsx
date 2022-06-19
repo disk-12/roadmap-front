@@ -45,10 +45,3 @@ const MyPage: NextPage = () => {
 
 export default MyPage
 const TabList = [{ title: '投稿リスト' }, { title: 'お気に入り' }, { title: '閲覧履歴' }] as const
-
-type Data = {
-  id: number
-  title: string
-  summary: string
-  imgurl?: string
-}

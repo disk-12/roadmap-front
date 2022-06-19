@@ -1,11 +1,9 @@
-import axios from 'axios'
 import {
   faArrowUp,
   faArrowUpRightDots,
   faCommentMedical,
   faInfoCircle,
   faPenToSquare,
-  faSearch,
   faTrashCan,
   faUpDownLeftRight,
 } from '@fortawesome/free-solid-svg-icons'
