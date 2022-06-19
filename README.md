@@ -8,21 +8,6 @@
 yarn install
 ```
 
-### モックサーバ関連 (バックさんとつながり次第削除)
-
-#### モック DB
-
-```bash
-cd db
-docker compose up
-```
-
-#### モッククライアント生成
-
-```bash
-yarn prisma:generate
-```
-
 ### 開発起動
 
 ```bash

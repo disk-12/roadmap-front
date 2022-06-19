@@ -3,7 +3,7 @@ import { Box } from '@mui/system'
 import { Typography } from '@mui/material'
 import Link from 'next/link'
 
-export const RoadmapCard: FC<{ id: number; imgUrl: string; title: string; summary: string }> = ({
+export const RoadmapCard: FC<{ id: string | number; imgUrl: string; title: string; summary: string }> = ({
   id,
   imgUrl,
   title,

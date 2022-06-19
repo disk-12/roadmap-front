@@ -26,7 +26,8 @@
     "react": "^18.1.0",
     "react-dom": "18.1.0",
     "react-player": "^2.10.1",
-    "react-query": "^3.39.1"
+    "react-query": "^3.39.1",
+    "type-fest": "^2.13.1"
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^9.1.2",

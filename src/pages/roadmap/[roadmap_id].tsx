@@ -1,4 +1,3 @@
-import axios from 'axios'
 import { Box } from '@mui/system'
 import { Button, Dialog, IconButton, Typography } from '@mui/material'
 import { NextPage } from 'next'
@@ -6,23 +5,27 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Arrow } from 'components/Arrow'
 import { NodeBox } from 'components/NodeBox'
-import { VideoBox } from 'components/VideoBox'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCircleExclamation, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { useQuery } from 'react-query'
+import { request, ResponseData } from 'schemaHelper'
 
 const RoadmapPage: NextPage = () => {
   const router = useRouter()
-  const [modalData, setModalData] = useState<Maps | undefined>()
-  const [endList, setEndList] = useState<number[]>([])
+  const [modalData, setModalData] = useState<
+    ResponseData<'/roadmaps/{roadmap_id}', 'get'>['vertexes'][number] | undefined
+  >()
+  const [endList, setEndList] = useState<string[]>([])
   const [infoOpen, setInfoOpen] = useState(false)
   const id = router.query['roadmap_id']
 
   const { data } = useQuery(['/api/get_single_roadmap', { id }], async () =>
-    id !== undefined ? axios.get<GetRequest>(`/api/get_single_roadmap?id=${id}`).then(({ data }) => data) : undefined
+    id !== undefined
+      ? request({ url: '/roadmaps/{roadmap_id}', method: 'get' }, Number(id)).then(({ data }) => data)
+      : undefined
   )
-  const nodeList = data?.node || []
-  const arrowList = data?.arrow || []
+  const nodeList = data?.vertexes || []
+  const arrowList = data?.edges || []
   const achievementPer = nodeList.length ? Math.round((endList.length / nodeList.length) * 100) : 0
 
   return (
@@ -67,9 +70,9 @@ const RoadmapPage: NextPage = () => {
         {nodeList.map((e) => (
           <NodeBox
             key={e.id}
-            top={e.y}
-            left={e.x}
-            title={e.title}
+            top={e.y_coordinate}
+            left={e.x_coordinate}
+            title={'ノードのタイトル'}
             p={1}
             zIndex={1}
             onClick={() => setModalData(e)}
@@ -77,11 +80,18 @@ const RoadmapPage: NextPage = () => {
           />
         ))}
         {arrowList.map((e) => {
-          const fromNode = nodeList.find(({ id }) => id === e.from_node)
-          const toNode = nodeList.find(({ id }) => id === e.to_node)
+          const fromNode = nodeList.find(({ id }) => id === e.source_id)
+          const toNode = nodeList.find(({ id }) => id === e.target_id)
           console.log(fromNode, toNode)
           if (!fromNode || !toNode) return <span key={e.id} />
-          return <Arrow key={e.id} from={{ ...fromNode }} to={{ ...toNode }} dashed={e.dashed} />
+          return (
+            <Arrow
+              key={e.id}
+              from={{ x: fromNode.x_coordinate, y: fromNode.y_coordinate }}
+              to={{ x: toNode.x_coordinate, y: toNode.y_coordinate }}
+              dashed={e.is_solid_line}
+            />
+          )
         })}
       </Box>
       {modalData && (
@@ -89,24 +99,26 @@ const RoadmapPage: NextPage = () => {
           <Box>
             <Box mr={'auto'} p={2} display='flex' alignItems='center' justifyContent='space-between'>
               <Typography fontWeight='bold' component='h2' fontSize='large'>
-                {modalData.title}
+                {'v title'}
               </Typography>
               <Button color='error' variant='outlined' onClick={() => setModalData(undefined)}>
                 x
               </Button>
             </Box>
             <Box p={1}>
+              {/*
               <VideoBox
                 {...modalData}
                 startSecond={modalData.video_from_sec}
                 endSecond={modalData.video_to_sec}
                 onEnd={() => setEndList((l) => [...new Set([...l, modalData.id])])}
               />
+              */}
             </Box>
             <Box px={3} py={1}>
-              <Typography>{modalData.url}</Typography>
+              <Typography>{'(url)'}</Typography>
               <Typography py={1} fontSize='smaller'>
-                {modalData.summary}
+                {'(summary)'}
               </Typography>
             </Box>
           </Box>
@@ -123,7 +135,7 @@ const RoadmapPage: NextPage = () => {
             </IconButton>
           </Box>
           <Typography fontWeight='bold' py={2}>
-            {data?.summary}
+            {'ここに説明文など'}
           </Typography>
           <Typography py={2}>（このへんにタグとかtwitterリンクとか諸情報乗っける）</Typography>
           <Box display='flex' gap={2} width='100%' justifyContent='space-evenly'>
@@ -141,28 +153,3 @@ const RoadmapPage: NextPage = () => {
 }
 
 export default RoadmapPage
-
-type Maps = {
-  id: number
-  x: number
-  y: number
-  title: string
-  summary: string
-  url: string
-  video_from_sec?: number
-  video_to_sec?: number
-}
-
-type Arrow = {
-  id: number
-  from_node: number
-  to_node: number
-  dashed: boolean
-}
-
-type GetRequest = {
-  node: Maps[]
-  arrow: Arrow[]
-  title: string
-  summary: string
-}

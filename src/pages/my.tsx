@@ -5,10 +5,13 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
+import { ResponseData } from 'schemaHelper'
 
 const MyPage: NextPage = () => {
   const [tab, setTab] = useState(0)
-  const { data } = useQuery('/api/get_mymap', () => axios.get<Data[]>('/api/get_mymap').then(({ data }) => data))
+  const { data } = useQuery('/favorites', () =>
+    axios.get<ResponseData<'/home_timeline', 'get'>>('/favorites').then(({ data }) => data)
+  )
   return (
     <Box>
       <Box bgcolor='white'>
@@ -28,7 +31,7 @@ const MyPage: NextPage = () => {
             </Link>
           </Box>
           {data?.map((e) => (
-            <RoadmapCard key={e.id} imgUrl={e.imgurl || ''} id={e.id} summary={e.summary} title={e.title} />
+            <RoadmapCard key={e.id} imgUrl={''} id={Number(e.id)} summary={'summary'} title={e.title} />
           ))}
         </>
       ) : (
@@ -42,10 +45,3 @@ const MyPage: NextPage = () => {
 
 export default MyPage
 const TabList = [{ title: '投稿リスト' }, { title: 'お気に入り' }, { title: '閲覧履歴' }] as const
-
-type Data = {
-  id: number
-  title: string
-  summary: string
-  imgurl?: string
-}
