@@ -8,14 +8,18 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useMutation } from 'react-query'
+import { ResponseData } from 'schemaHelper'
 
 const SearchPage: NextPage = () => {
   const [tab, setTab] = useState(0)
   const [searchText, setSearchText] = useState('')
-  const [data, setData] = useState<ListType[]>([])
+  const [data, setData] = useState<ResponseData<'/home_timeline', 'get'>>([])
 
   const { mutate } = useMutation<unknown, unknown, string>(
-    async (params) => await axios.get<ListType[]>(`/api/get_search?keyword=${params}`).then(({ data }) => setData(data))
+    async (params) =>
+      await axios
+        .get<ResponseData<'/home_timeline', 'get'>>(`/search/roadmaps/${params}`)
+        .then(({ data }) => setData(data))
   )
 
   return (
@@ -42,7 +46,7 @@ const SearchPage: NextPage = () => {
       </Box>
       <Box flexGrow={1} display='flex' flexDirection='column'>
         {data.map((e) => (
-          <RoadmapCard key={e.id} title={e.title} id={e.id} imgUrl={e.imgurl} summary={e.summary} />
+          <RoadmapCard key={e.id} imgUrl={''} id={Number(e.id)} summary={'summary'} title={e.title} />
         ))}
       </Box>
     </Box>
@@ -50,10 +54,3 @@ const SearchPage: NextPage = () => {
 }
 
 export default SearchPage
-
-type ListType = {
-  id: number
-  summary: string
-  title: string
-  imgurl: string
-}

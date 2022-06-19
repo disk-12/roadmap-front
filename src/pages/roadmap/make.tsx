@@ -18,44 +18,69 @@ import { Arrow } from 'components/Arrow'
 import { NodeBox } from 'components/NodeBox'
 import { VideoBox } from 'components/VideoBox'
 import { useRouter } from 'next/router'
+import { request, RequestData } from 'schemaHelper'
+import { useMutation } from 'react-query'
+
+type Vertexes = RequestData<'/roadmaps', 'post'>['vertexes']
+type Edges = RequestData<'/roadmaps', 'post'>['edges']
 
 const MakeRoadmap: NextPage = () => {
   const [mode, setMode] = useState<'addNode' | 'addMainLine' | 'addSubLine' | 'setNode' | 'info' | 'delete'>('addNode')
-  const [arrowList, setArrowList] = useState<Arrow[]>([])
-  const [nodeList, setNodeList] = useState<MapNode[]>([])
+
+  const [vertexList, setVertexList] = useState<Vertexes>([])
+  const [edgeList, setEdgeList] = useState<Edges>([])
   const [nodeId, setNodeId] = useState(0)
-  const [modalData, setModalData] = useState<MapNode | undefined>()
-  const [addLineTemp, setAddLineTemp] = useState<number | undefined>()
+  const [modalData, setModalData] = useState<Vertexes[number] | undefined>()
+  const [addLineTemp, setAddLineTemp] = useState<string | undefined>()
   const [roadmapData, setRoadmapData] = useState<{ title: string; summary: string }>({ title: '', summary: '' })
   const [editingUrl, setEditingUrl] = useState('')
   const router = useRouter()
 
-  const onSubmit = async () => {
-    axios.post('/api/add_map', { ...roadmapData, nodeList, arrowList })
-    router.push('/my')
-  }
+  const $post = useMutation<unknown, unknown, RequestData<'/roadmaps', 'post'>>(
+    async (params) => {
+      request({
+        url: '/roadmaps',
+        method: 'post',
+        data: params,
+      })
+    },
+    {
+      onSuccess: () => {
+        // ここに投稿完了演出
+        router.push('/my')
+      },
+    }
+  )
 
-  const addNodeContents = (x: number, y: number) => {
-    setNodeList((l) => [...l, { id: nodeId, x, y, title: '', summary: '', url: '' }])
+  const addVertexListContents = (x: number, y: number) => {
+    setVertexList((l) => [...l, { id: String(nodeId), x_coordinate: x, y_coordinate: y }])
     setNodeId((e) => e + 1)
   }
 
-  const addLineContents = (nodeId: number) => {
+  const addLineContents = (vertexId: string) => {
     if (addLineTemp === undefined) {
-      setAddLineTemp(nodeId)
+      setAddLineTemp(vertexId)
       return
     }
-    if (nodeId === addLineTemp) {
+    if (vertexId === addLineTemp) {
       setAddLineTemp(undefined)
       return
     }
-    setArrowList((l) => [...l, { from: addLineTemp, to: nodeId, dashed: mode === 'addSubLine' }])
+    setEdgeList((l) => [
+      ...l,
+      {
+        id: Math.random().toString(),
+        source_id: addLineTemp,
+        target_id: vertexId,
+        is_solid_line: mode === 'addSubLine',
+      },
+    ])
     setAddLineTemp(undefined)
   }
 
-  const deleteNode = (id: number) => {
-    setNodeList((l) => l.filter((e) => e.id !== id))
-    setArrowList((l) => l.filter(({ from, to }) => id !== from && id !== to))
+  const deleteVertex = (id: string) => {
+    setVertexList((l) => l.filter((e) => e.id !== id))
+    setEdgeList((l) => l.filter(({ source_id, target_id }) => id !== source_id && id !== target_id))
   }
 
   return (
@@ -63,7 +88,7 @@ const MakeRoadmap: NextPage = () => {
       position='relative'
       width='100%'
       height='100%'
-      onClick={({ clientX, clientY }) => mode === 'addNode' && addNodeContents(clientX, clientY)}
+      onClick={({ clientX, clientY }) => mode === 'addNode' && addVertexListContents(clientX, clientY)}
       fontSize='small'
     >
       <Box position='absolute' right={0} bottom={0} p={2} display='grid' onClick={(e) => e.stopPropagation()} gap={1}>
@@ -81,38 +106,41 @@ const MakeRoadmap: NextPage = () => {
           </Button>
         ))}
       </Box>
-      {nodeList.map((e) => (
+      {vertexList.map((e) => (
         <NodeBox
           key={e.id}
-          top={e.y}
-          left={e.x}
-          title={e.title === '' ? '新しいノード' : e.title}
+          top={e.y_coordinate}
+          left={e.x_coordinate}
+          title={'新しいノード' /* TODO: タイトル管理 */}
           p={1}
           zIndex={1}
-          isActive={mode === 'setNode' ? e.title !== '' && e.url !== '' : addLineTemp === e.id}
+          isActive={true}
+          /* isActive={mode === 'setNode' ? e.title !== '' && e.url !== '' : addLineTemp === e.id} **/
           onClick={(f) => {
             f.stopPropagation()
             if (mode === 'addMainLine' || mode === 'addSubLine') addLineContents(e.id)
             else if (mode === 'setNode') {
-              setEditingUrl(e.url)
+              // setEditingUrl(e.url)
               setModalData(e)
-            } else if (mode === 'delete') deleteNode(e.id)
+            } else if (mode === 'delete') deleteVertex(e.id)
           }}
         />
       ))}
-      {arrowList.map((e, idx) => {
-        const fromNode = nodeList.find(({ id }) => id === e.from)
-        const toNode = nodeList.find(({ id }) => id === e.to)
+      {edgeList.map((e, idx) => {
+        const fromNode = vertexList.find(({ id }) => id === e.source_id)
+        const toNode = vertexList.find(({ id }) => id === e.target_id)
         if (!fromNode || !toNode) return <></>
         return (
           <Arrow
             key={idx}
-            from={{ ...fromNode }}
-            to={{ ...toNode }}
-            dashed={e.dashed}
+            from={{ x: fromNode.x_coordinate, y: fromNode.y_coordinate }}
+            to={{ x: toNode.x_coordinate, y: toNode.y_coordinate }}
+            dashed={e.is_solid_line}
             onClick={(ele) => {
               ele.stopPropagation()
-              setArrowList((l) => l.filter(({ from, to }) => e.from !== from || e.to !== to))
+              setEdgeList((l) =>
+                l.filter(({ source_id, target_id }) => e.source_id !== source_id || e.target_id !== target_id)
+              )
             }}
           />
         )
@@ -130,7 +158,8 @@ const MakeRoadmap: NextPage = () => {
               fontWeight='bold'
             >
               <TextField
-                value={modalData.title}
+                value={'仕様確認しましょう'}
+                disabled
                 onChange={({ target }) => setModalData(() => ({ ...modalData, title: target.value }))}
                 placeholder='タイトルを入力'
                 variant='outlined'
@@ -138,6 +167,7 @@ const MakeRoadmap: NextPage = () => {
                 fullWidth
               />
             </Box>
+            {/* 
             <Box p={1}>
               {modalData.url !== '' ? (
                 <VideoBox {...modalData} url={modalData.url} onEnd={() => {}} />
@@ -158,9 +188,11 @@ const MakeRoadmap: NextPage = () => {
                 <FontAwesomeIcon icon={faSearch} />
               </IconButton>
             </Box>
+            */}
             <Box px={3} py={0.5} display='flex' gap={1}>
               <TextField
-                value={modalData.startSecond || ''}
+                value={'始まり秒数'}
+                disabled
                 onChange={({ target }) =>
                   setModalData(() => ({
                     ...modalData,
@@ -173,7 +205,8 @@ const MakeRoadmap: NextPage = () => {
               />
               秒 ~
               <TextField
-                value={modalData.endSecond || ''}
+                disabled
+                value={'終わり秒数'}
                 onChange={({ target }) =>
                   setModalData(() => ({
                     ...modalData,
@@ -188,7 +221,7 @@ const MakeRoadmap: NextPage = () => {
             </Box>
             <Box px={3} py={0.5}>
               <TextField
-                value={modalData.summary}
+                value={'summary TODO: 仕様確認'}
                 onChange={({ target }) => setModalData(() => ({ ...modalData, summary: target.value }))}
                 placeholder='ノードの説明'
                 variant='outlined'
@@ -206,7 +239,7 @@ const MakeRoadmap: NextPage = () => {
                 color='primary'
                 variant='contained'
                 onClick={() => {
-                  setNodeList((l) => [...l.map((e) => (e.id === modalData.id ? { ...modalData } : { ...e }))])
+                  setVertexList((l) => [...l.map((e) => (e.id === modalData.id ? { ...modalData } : { ...e }))])
                   setModalData(undefined)
                 }}
                 sx={{ mx: 1 }}
@@ -221,8 +254,8 @@ const MakeRoadmap: NextPage = () => {
         <Box bgcolor='#f5f5f5' p={2} display='flex' flexDirection='column' gap={2}>
           <Box color='red' fontSize='xx-small' display='flex' flexDirection='column' gap={0.25}>
             {roadmapData.title === '' && <Typography>* タイトルを入力してください</Typography>}
-            {nodeList.length === 0 && <Typography>* ノードを追加してください</Typography>}
-            {nodeList.some((e) => e.title === '' || e.url === '') && (
+            {vertexList.length === 0 && <Typography>* ノードを追加してください</Typography>}
+            {vertexList.some(() => false /* ここに各種制限（タイトル未記入など） */) && (
               <Typography>* 編集不足のノードがあります</Typography>
             )}
           </Box>
@@ -250,12 +283,19 @@ const MakeRoadmap: NextPage = () => {
             <Button
               variant='contained'
               color='primary'
-              onClick={() => onSubmit()}
+              onClick={() =>
+                $post.mutate({
+                  title: roadmapData.title,
+                  tags: [],
+                  edges: edgeList,
+                  vertexes: vertexList,
+                })
+              }
               fullWidth
               disabled={
                 roadmapData.title === '' ||
-                nodeList.length === 0 ||
-                nodeList.some((e) => e.title === '' || e.url === '')
+                vertexList.length === 0 ||
+                vertexList.some(() => false /* ここに各種制限（タイトル未記入など） */)
               }
             >
               投稿する
@@ -277,20 +317,3 @@ const optionList = [
   { icon: faTrashCan, mode: 'delete' },
   { icon: faInfoCircle, mode: 'info' },
 ] as const
-
-type MapNode = {
-  id: number
-  x: number
-  y: number
-  title: string
-  summary: string
-  url: string
-  startSecond?: number
-  endSecond?: number
-}
-
-type Arrow = {
-  from: number
-  to: number
-  dashed: boolean
-}
