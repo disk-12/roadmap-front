@@ -1,6 +1,7 @@
 import { Box, Tab, Tabs } from '@mui/material'
 import axios from 'axios'
 import { RoadmapCard } from 'components/RoadmapCard'
+import dayjs from 'dayjs'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -31,7 +32,15 @@ const MyPage: NextPage = () => {
             </Link>
           </Box>
           {data?.map((e) => (
-            <RoadmapCard key={e.id} imgUrl={''} id={Number(e.id)} summary={'summary'} title={e.title} />
+            <RoadmapCard
+              key={e.id}
+              imgUrl={''}
+              id={e.id}
+              summary={'summary'}
+              title={e.title}
+              favCount={e.favorite_count}
+              createdAt={dayjs(e.created_at).format('YY-MM-DD')}
+            />
           ))}
         </>
       ) : (

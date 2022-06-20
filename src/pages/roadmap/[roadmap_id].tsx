@@ -20,8 +20,8 @@ const RoadmapPage: NextPage = () => {
   const id = router.query['roadmap_id']
 
   const { data } = useQuery(['/api/get_single_roadmap', { id }], async () =>
-    id !== undefined
-      ? request({ url: '/roadmaps/{roadmap_id}', method: 'get' }, Number(id)).then(({ data }) => data)
+    typeof id === 'string'
+      ? request({ url: '/roadmaps/{roadmap_id}', method: 'get' }, id).then(({ data }) => data)
       : undefined
   )
   const nodeList = data?.vertexes || []

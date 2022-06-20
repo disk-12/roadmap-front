@@ -26,11 +26,11 @@ export type AxiosConfigWrapper<Path extends UrlPaths, Method extends HttpMethods
 }
 export function request<Path extends UrlPaths, Method extends HttpMethods>(
   config: AxiosConfigWrapper<Path, Method>,
-  id?: number
+  id?: string
 ) {
   return axios.request<
     ResponseData<Path, Method>,
     AxiosResponse<ResponseData<Path, Method>>,
     AxiosConfigWrapper<Path, Method>['data']
-  >(typeof id === 'number' ? { ...config, url: config.url.replace(/{.*}/g, id.toString()) } : config)
+  >(typeof id === 'string' ? { ...config, url: config.url.replace(/{.*}/g, id) } : config)
 }
