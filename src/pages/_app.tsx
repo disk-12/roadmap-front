@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { useState } from 'react'
 import { API_ENDPOINT, MOCK_BEARER } from 'env'
 import 'reset.css'
+import 'day'
 
 axios.defaults.baseURL = API_ENDPOINT
 axios.defaults.headers.common['Authorization'] = `Bearer ${MOCK_BEARER}`

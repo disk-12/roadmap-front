@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { RoadmapCard } from 'components/RoadmapCard'
 import { request } from 'schemaHelper'
+import dayjs from 'dayjs'
 
 const Home: NextPage = () => {
   const [tab, setTab] = useState(0)
@@ -24,7 +25,15 @@ const Home: NextPage = () => {
       {tab === 0 ? (
         data?.map((e) => (
           /* TODO: サムネどうする？ */
-          <RoadmapCard key={e.id} imgUrl={''} id={Number(e.id)} summary={'summary'} title={e.title} />
+          <RoadmapCard
+            key={e.id}
+            imgUrl={''}
+            id={e.id}
+            summary={'summary'}
+            title={e.title}
+            favCount={e.favorite_count}
+            createdAt={dayjs(e.created_at).format('YY-MM-DD')}
+          />
         ))
       ) : (
         <Box m={1} p={1} bgcolor='white'>

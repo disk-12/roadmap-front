@@ -4,6 +4,7 @@ import { Button, Tab, Tabs, TextField } from '@mui/material'
 import { Box } from '@mui/system'
 import axios from 'axios'
 import { RoadmapCard } from 'components/RoadmapCard'
+import dayjs from 'dayjs'
 import { NextPage } from 'next'
 import { useState } from 'react'
 import { useMutation } from 'react-query'
@@ -45,7 +46,15 @@ const SearchPage: NextPage = () => {
       </Box>
       <Box flexGrow={1} display='flex' flexDirection='column'>
         {data.map((e) => (
-          <RoadmapCard key={e.id} imgUrl={''} id={Number(e.id)} summary={'summary'} title={e.title} />
+          <RoadmapCard
+            key={e.id}
+            imgUrl={''}
+            id={e.id}
+            summary={'summary'}
+            title={e.title}
+            favCount={e.favorite_count}
+            createdAt={dayjs(e.created_at).format('YY-MM-DD')}
+          />
         ))}
       </Box>
     </Box>
