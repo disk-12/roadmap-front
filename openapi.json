@@ -337,10 +337,15 @@
       },
       "Vertex": {
         "title": "Vertex",
-        "required": ["id", "x_coordinate", "y_coordinate"],
+        "required": ["id", "x_coordinate", "y_coordinate", "title", "summary", "url", "from_sec", "to_sec"],
         "type": "object",
         "properties": {
           "id": { "title": "Id", "type": "string" },
+          "title": { "title": "title", "type": "string" },
+          "summary": { "title": "summary", "type": "string" },
+          "url": { "title": "url", "type": "string" },
+          "from_sec": { "title": "from sec", "type": "integer" },
+          "to_sec": { "title": "to sec", "type": "integer" },
           "x_coordinate": { "title": "X Coordinate", "type": "integer" },
           "y_coordinate": { "title": "Y Coordinate", "type": "integer" }
         }
