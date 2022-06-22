@@ -4,6 +4,7 @@ import {
   faCommentMedical,
   faInfoCircle,
   faPenToSquare,
+  faSearch,
   faTrashCan,
   faUpDownLeftRight,
 } from '@fortawesome/free-solid-svg-icons'
@@ -18,6 +19,7 @@ import { VideoBox } from 'components/VideoBox'
 import { useRouter } from 'next/router'
 import { request, RequestData } from 'schemaHelper'
 import { useMutation } from 'react-query'
+import { LottieModal } from 'components/LottieModal'
 
 type Vertexes = RequestData<'/roadmaps', 'post'>['vertexes']
 type Edges = RequestData<'/roadmaps', 'post'>['edges']
@@ -33,6 +35,7 @@ const MakeRoadmap: NextPage = () => {
   const [roadmapData, setRoadmapData] = useState<{ title: string; summary: string }>({ title: '', summary: '' })
   const [editingUrl, setEditingUrl] = useState('')
   const router = useRouter()
+  const [postedData, setPostedData] = useState<{ title: string }>()
 
   const $post = useMutation<unknown, unknown, RequestData<'/roadmaps', 'post'>>(
     async (params) => {
@@ -44,14 +47,25 @@ const MakeRoadmap: NextPage = () => {
     },
     {
       onSuccess: () => {
-        // ここに投稿完了演出
-        router.push('/my')
+        setPostedData({ title: '投稿完了！' })
       },
     }
   )
 
   const addVertexListContents = (x: number, y: number) => {
-    setVertexList((l) => [...l, { id: String(nodeId), x_coordinate: x, y_coordinate: y }])
+    setVertexList((l) => [
+      ...l,
+      {
+        id: String(nodeId),
+        x_coordinate: x,
+        y_coordinate: y,
+        url: '',
+        title: '',
+        from_sec: 0,
+        to_sec: 100,
+        summary: '',
+      },
+    ])
     setNodeId((e) => e + 1)
   }
 
@@ -109,16 +123,15 @@ const MakeRoadmap: NextPage = () => {
           key={e.id}
           top={e.y_coordinate}
           left={e.x_coordinate}
-          title={'新しいノード' /* TODO: タイトル管理 */}
+          title={e.title === '' ? '新しいノード' : e.title}
           p={1}
           zIndex={1}
-          isActive={true}
-          /* isActive={mode === 'setNode' ? e.title !== '' && e.url !== '' : addLineTemp === e.id} **/
+          isActive={mode === 'setNode' ? e.title !== '' && e.url !== '' : addLineTemp === e.id}
           onClick={(f) => {
             f.stopPropagation()
             if (mode === 'addMainLine' || mode === 'addSubLine') addLineContents(e.id)
             else if (mode === 'setNode') {
-              // setEditingUrl(e.url)
+              setEditingUrl(e.url)
               setModalData(e)
             } else if (mode === 'delete') deleteVertex(e.id)
           }}
@@ -156,8 +169,7 @@ const MakeRoadmap: NextPage = () => {
               fontWeight='bold'
             >
               <TextField
-                value={'仕様確認しましょう'}
-                disabled
+                value={modalData.title}
                 onChange={({ target }) => setModalData(() => ({ ...modalData, title: target.value }))}
                 placeholder='タイトルを入力'
                 variant='outlined'
@@ -165,7 +177,6 @@ const MakeRoadmap: NextPage = () => {
                 fullWidth
               />
             </Box>
-            {/* 
             <Box p={1}>
               {modalData.url !== '' ? (
                 <VideoBox {...modalData} url={modalData.url} onEnd={() => {}} />
@@ -186,15 +197,13 @@ const MakeRoadmap: NextPage = () => {
                 <FontAwesomeIcon icon={faSearch} />
               </IconButton>
             </Box>
-            */}
             <Box px={3} py={0.5} display='flex' gap={1}>
               <TextField
-                value={'始まり秒数'}
-                disabled
+                value={modalData.from_sec}
                 onChange={({ target }) =>
                   setModalData(() => ({
                     ...modalData,
-                    startSecond: target.value === '' ? undefined : Number(target.value),
+                    from_sec: target.value === '' ? 0 : Number(target.value),
                   }))
                 }
                 placeholder='開始秒数'
@@ -203,12 +212,11 @@ const MakeRoadmap: NextPage = () => {
               />
               秒 ~
               <TextField
-                disabled
-                value={'終わり秒数'}
+                value={modalData.to_sec}
                 onChange={({ target }) =>
                   setModalData(() => ({
                     ...modalData,
-                    endSecond: target.value === '' ? undefined : Number(target.value),
+                    to_sec: target.value === '' ? 0 : Number(target.value),
                   }))
                 }
                 placeholder='終了秒数'
@@ -219,7 +227,7 @@ const MakeRoadmap: NextPage = () => {
             </Box>
             <Box px={3} py={0.5}>
               <TextField
-                value={'summary TODO: 仕様確認'}
+                value={modalData.summary}
                 onChange={({ target }) => setModalData(() => ({ ...modalData, summary: target.value }))}
                 placeholder='ノードの説明'
                 variant='outlined'
@@ -301,6 +309,7 @@ const MakeRoadmap: NextPage = () => {
           </Box>
         </Box>
       </Dialog>
+      {postedData && <LottieModal onClose={() => router.push('/my')} title={postedData.title} />}
     </Box>
   )
 }

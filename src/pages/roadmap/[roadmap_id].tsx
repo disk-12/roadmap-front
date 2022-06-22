@@ -2,13 +2,15 @@ import { Box } from '@mui/system'
 import { Button, Dialog, IconButton, Typography } from '@mui/material'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Arrow } from 'components/Arrow'
 import { NodeBox } from 'components/NodeBox'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCircleExclamation, faHeart } from '@fortawesome/free-solid-svg-icons'
 import { useQuery } from 'react-query'
 import { request, ResponseData } from 'schemaHelper'
+import { LottieModal } from 'components/LottieModal'
+import { VideoBox } from 'components/VideoBox'
 
 const RoadmapPage: NextPage = () => {
   const router = useRouter()
@@ -18,6 +20,7 @@ const RoadmapPage: NextPage = () => {
   const [endList, setEndList] = useState<string[]>([])
   const [infoOpen, setInfoOpen] = useState(false)
   const id = router.query['roadmap_id']
+  const [achiveOpen, setAchiveOpen] = useState<{ persent: number; open: boolean; text: string }[]>([])
 
   const { data } = useQuery(['/api/get_single_roadmap', { id }], async () =>
     typeof id === 'string'
@@ -27,6 +30,12 @@ const RoadmapPage: NextPage = () => {
   const nodeList = data?.vertexes || []
   const arrowList = data?.edges || []
   const achievementPer = nodeList.length ? Math.round((endList.length / nodeList.length) * 100) : 0
+  useEffect(() => {
+    if (achievementPer === 50)
+      setTimeout(() => setAchiveOpen((l) => [...l, { persent: 50, open: true, text: 'のこりはんぶん' }]), 1000)
+    if (achievementPer === 100)
+      setTimeout(() => setAchiveOpen((l) => [...l, { persent: 100, open: true, text: '履修完了！' }]), 1000)
+  }, [achievementPer])
 
   return (
     <Box textAlign='left' width='100%' height='100%'>
@@ -72,7 +81,7 @@ const RoadmapPage: NextPage = () => {
             key={e.id}
             top={e.y_coordinate}
             left={e.x_coordinate}
-            title={'ノードのタイトル'}
+            title={e.title}
             p={1}
             zIndex={1}
             onClick={() => setModalData(e)}
@@ -99,26 +108,24 @@ const RoadmapPage: NextPage = () => {
           <Box>
             <Box mr={'auto'} p={2} display='flex' alignItems='center' justifyContent='space-between'>
               <Typography fontWeight='bold' component='h2' fontSize='large'>
-                {'v title'}
+                {modalData.title}
               </Typography>
               <Button color='error' variant='outlined' onClick={() => setModalData(undefined)}>
                 x
               </Button>
             </Box>
             <Box p={1}>
-              {/*
               <VideoBox
                 {...modalData}
-                startSecond={modalData.video_from_sec}
-                endSecond={modalData.video_to_sec}
+                startSecond={modalData.from_sec}
+                endSecond={modalData.to_sec}
                 onEnd={() => setEndList((l) => [...new Set([...l, modalData.id])])}
               />
-              */}
             </Box>
             <Box px={3} py={1}>
-              <Typography>{'(url)'}</Typography>
+              <Typography>{modalData.url}</Typography>
               <Typography py={1} fontSize='smaller'>
-                {'(summary)'}
+                {modalData.summary}
               </Typography>
             </Box>
           </Box>
@@ -148,6 +155,12 @@ const RoadmapPage: NextPage = () => {
           </Box>
         </Box>
       </Dialog>
+      {achiveOpen.length !== 0 && achiveOpen[achiveOpen.length - 1].open && (
+        <LottieModal
+          title={achiveOpen[achiveOpen.length - 1].text}
+          onClose={() => setAchiveOpen((l) => l.map((e) => (e.open ? { ...e, open: false } : e)))}
+        />
+      )}
     </Box>
   )
 }
