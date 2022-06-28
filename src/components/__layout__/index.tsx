@@ -30,17 +30,17 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
     </Box>
   )
 }
-type tabList=()=>{url:string,title:string,icon:IconDefinition}[]
+type tabList = () => { url: string; title: string; icon: IconDefinition }[]
 
 const Footer = () => {
   const { pathname } = useRouter()
-  const [user, loading, error] = useAuthState(auth);
+  const [user, loading, error] = useAuthState(auth)
 
-  const makeTabList:tabList = () =>{
+  const makeTabList: tabList = () => {
     return [
       { url: '/', title: 'ホーム', icon: faHome },
       { url: '/search', title: '検索', icon: faSearch },
-      user?{ url: '/my', title: 'マイページ', icon: faUser }:{ url: '/signin', title: 'ログイン', icon: faUser },
+      user ? { url: '/my', title: 'マイページ', icon: faUser } : { url: '/signin', title: 'ログイン', icon: faUser },
       { url: '/notification', title: '通知', icon: faBell },
     ]
   }
