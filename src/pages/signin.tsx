@@ -2,24 +2,36 @@ import { Avatar, Box, Button, Grid, Link, Paper, TextField, Typography } from '@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { teal } from '@mui/material/colors'
 import { NextPage } from 'next'
-import { auth, setToken } from 'services/firebase'
+import { auth, setToken, translateErrorMessage } from 'services/firebase'
 import { useRouter } from 'next/router'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { signInWithEmailAndPassword } from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
 
 const Login: NextPage = () => {
   const router = useRouter()
   const emailRef = useRef<HTMLFormElement>()
   const passwordRef = useRef<HTMLFormElement>()
+  const [errorMsg, setErrorMsg] = useState<string | null>()
   const signInHundler = () => {
     const email = emailRef.current?.value
     const password = passwordRef.current?.value
-    try {
-      signInWithEmailAndPassword(auth, email, password).then()
-    } catch (error) {
-      alert(error)
+    const signin = async () => {
+      try {
+        await signInWithEmailAndPassword(auth, email, password).then(() => {
+          setErrorMsg(null)
+          router.push('/my')
+        })
+      } catch (error) {
+        if (error instanceof FirebaseError) {
+          setErrorMsg(translateErrorMessage(error, 'signin'))
+        } else {
+          console.log(error)
+        }
+      }
+      setToken()
     }
-    setToken()
+    signin()
   }
   return (
     <Grid>
@@ -41,7 +53,7 @@ const Login: NextPage = () => {
           <Avatar sx={{ bgcolor: teal[400] }}>
             <LockOutlinedIcon />
           </Avatar>
-          <Typography variant={'h5'} sx={{ m: '30px' }}>
+          <Typography variant={'h5'} sx={{ marginX: '0px', marginY: '30px' }}>
             ログイン
           </Typography>
         </Grid>
@@ -50,13 +62,15 @@ const Login: NextPage = () => {
         {/* ラベルとチェックボックス */}
 
         <Box mt={3}>
+          <Typography color={'red'}>{errorMsg}</Typography>
           <Button type='submit' color='primary' variant='contained' fullWidth onClick={signInHundler}>
             ログイン
           </Button>
-
+        </Box>
+        <Box mt={3}>
           <Typography variant='caption' display='block'>
             アカウントを持っていませんか？
-            <Link href='/signup'>アカウントを作成</Link>
+            <Link href='/signup'>登録</Link>
           </Typography>
           <Typography variant='caption' display='block'>
             （デモ用）

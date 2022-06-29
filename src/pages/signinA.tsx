@@ -2,24 +2,31 @@ import { Avatar, Box, Button, Grid, Paper, TextField, Typography } from '@mui/ma
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { teal } from '@mui/material/colors'
 import { NextPage } from 'next'
-import { auth, setToken } from 'services/firebase'
+import { auth, setToken, translateErrorMessage } from 'services/firebase'
 import { useRouter } from 'next/router'
 import { signInAnonymously } from 'firebase/auth'
 import axios from 'axios'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
+import { FirebaseError } from 'firebase/app'
 
 const AnonymousLogin: NextPage = () => {
   const router = useRouter()
   const usernameRef = useRef<HTMLFormElement>()
+  const [errorMsg, setErrorMsg] = useState<string | null>()
   const signInAnonymouslyHundler = () => {
     signInAnonymously(auth)
       .then(() => {
         setToken()
-        axios.post('/user', { name: usernameRef.current?.value }).then(({ data }) => data)
+        if (!usernameRef.current?.value) axios.post('/user', { name: 'no name' }).then(({ data }) => data)
+        else axios.post('/user', { name: usernameRef.current?.value }).then(({ data }) => data)
         router.push('/my')
       })
       .catch((error: any) => {
-        console.log(error)
+        if (error instanceof FirebaseError) {
+          setErrorMsg(translateErrorMessage(error, 'signin'))
+        } else {
+          console.log(error)
+        }
       })
   }
   return (
@@ -51,6 +58,7 @@ const AnonymousLogin: NextPage = () => {
         {/* ラベルとチェックボックス */}
 
         <Box mt={3}>
+          <Typography color={'red'}>{errorMsg}</Typography>
           <Button type='submit' color='primary' variant='contained' fullWidth onClick={signInAnonymouslyHundler}>
             ログイン
           </Button>
