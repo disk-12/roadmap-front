@@ -2,21 +2,31 @@ import { Box, Tab, Tabs } from '@mui/material'
 import { Header } from 'components/Header'
 import { RoadmapCard } from 'components/RoadmapCard'
 import dayjs from 'dayjs'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
+<<<<<<< HEAD
 import { request } from 'schemaHelper'
+=======
+import { ResponseData } from 'schemaHelper'
+import { auth } from 'services/firebase'
+>>>>>>> implement auth page
 
 const MyPage: NextPage = () => {
   const [tab, setTab] = useState(0)
   const { data: favs } = useQuery('/favorites', () =>
     request({ url: '/favorites', method: 'get' }).then(({ data }) => data)
   )
+<<<<<<< HEAD
   const { data: histories } = useQuery('/histories', () =>
     request({ url: '/histories', method: 'get' }).then(({ data }) => data)
   )
 
+=======
+
+  /* ログイン */
+>>>>>>> implement auth page
   return (
     <Box>
       <Header title='マイページ' url='/my' />

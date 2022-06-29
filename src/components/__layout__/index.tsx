@@ -1,10 +1,12 @@
-import { faBell, faHome, faSearch, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faHome, faSearch, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, ReactNode } from 'react'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { auth } from 'services/firebase'
 
 const fullScreenPage = ['/roadmap/make', '/roadmap/read', '/roadmap/edit']
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
@@ -23,10 +25,22 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
     </Box>
   )
 }
+type tabList=()=>{url:string,title:string,icon:IconDefinition}[]
 
 const Footer = () => {
   const { pathname } = useRouter()
-  const tab = TabList.findIndex((e) => e.url === pathname)
+  const [user, loading, error] = useAuthState(auth);
+
+  const makeTabList:tabList = () =>{
+    return [
+      { url: '/', title: 'ホーム', icon: faHome },
+      { url: '/search', title: '検索', icon: faSearch },
+      user?{ url: '/my', title: 'マイページ', icon: faUser }:{ url: '/signin', title: 'ログイン', icon: faUser },
+      { url: '/notification', title: '通知', icon: faBell },
+    ]
+  }
+
+  const tab = makeTabList().findIndex((e) => e.url === pathname)
   return (
     <Box
       bgcolor='white'
@@ -38,7 +52,7 @@ const Footer = () => {
       display='flex'
       justifyContent='space-between'
     >
-      {TabList.map((e, idx) => (
+      {makeTabList().map((e, idx) => (
         <Box
           key={idx}
           width='33%'

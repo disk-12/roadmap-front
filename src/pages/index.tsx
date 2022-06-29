@@ -6,17 +6,24 @@ import { useQuery } from 'react-query'
 import { RoadmapCard } from 'components/RoadmapCard'
 import { request } from 'schemaHelper'
 import dayjs from 'dayjs'
+<<<<<<< HEAD
 import { Header } from 'components/Header'
 
+=======
+import { auth } from 'services/firebase'
+>>>>>>> implement auth page
 const Home: NextPage = () => {
   const [tab, setTab] = useState(0)
   const { data } = useQuery('/home_timeline', () =>
     request({ url: '/home_timeline', method: 'get' }).then(({ data }) => data)
   )
+<<<<<<< HEAD
   const { data: recommendData } = useQuery('/recommend/roadmaps', () =>
     request({ url: '/recommend/roadmaps', method: 'get' }).then(({ data }) => data)
   )
 
+=======
+>>>>>>> implement auth page
   return (
     <Box>
       <Header url='/' />
