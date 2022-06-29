@@ -17,6 +17,7 @@ const MyPage: NextPage = () => {
     request({ url: '/histories', method: 'get' }).then(({ data }) => data)
   )
 
+  /* ログイン */
   return (
     <Box>
       <Header title='マイページ' url='/my' />
