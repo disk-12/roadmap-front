@@ -6,13 +6,12 @@ import { useQuery } from 'react-query'
 import { RoadmapCard } from 'components/RoadmapCard'
 import { request } from 'schemaHelper'
 import dayjs from 'dayjs'
-
+import { auth } from 'services/firebase'
 const Home: NextPage = () => {
   const [tab, setTab] = useState(0)
   const { data } = useQuery('/home_timeline', () =>
     request({ url: '/home_timeline', method: 'get' }).then(({ data }) => data)
   )
-
   return (
     <Box>
       <Box bgcolor='white'>

@@ -2,17 +2,20 @@ import { Box, Tab, Tabs } from '@mui/material'
 import axios from 'axios'
 import { RoadmapCard } from 'components/RoadmapCard'
 import dayjs from 'dayjs'
-import { NextPage } from 'next'
+import { GetServerSideProps, NextPage } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
 import { ResponseData } from 'schemaHelper'
+import { auth } from 'services/firebase'
 
 const MyPage: NextPage = () => {
   const [tab, setTab] = useState(0)
   const { data } = useQuery('/favorites', () =>
     axios.get<ResponseData<'/home_timeline', 'get'>>('/favorites').then(({ data }) => data)
   )
+
+  /* ログイン */
   return (
     <Box>
       <Box bgcolor='white'>
