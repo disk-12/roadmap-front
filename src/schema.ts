@@ -4,369 +4,580 @@
  */
 
 export interface paths {
-  "/tasks": {
-    get: operations["show_tasks_get"];
-    post: operations["create_tasks_post"];
-  };
-  "/user": {
-    get: operations["show_user_user_get"];
-    post: operations["create_user_user_post"];
-  };
-  "/users/{user_id}": {
-    get: operations["get_user_users__user_id__get"];
-  };
-  "/roadmaps": {
-    post: operations["create_roadmap_roadmaps_post"];
-  };
-  "/roadmaps/{roadmap_id}": {
-    get: operations["show_roadmap_roadmaps__roadmap_id__get"];
-    patch: operations["patch_roadmap_roadmaps__roadmap_id__patch"];
-  };
-  "/roadmaps/{roadmap_id}/favorite": {
-    post: operations["post_add_favorite_roadmaps__roadmap_id__favorite_post"];
-    delete: operations["post_delete_favorite_roadmaps__roadmap_id__favorite_delete"];
-  };
-  "/home_timeline": {
-    get: operations["get_home_timeline_home_timeline_get"];
-  };
-  "/": {
-    get: operations["read_root__get"];
-  };
+  '/user': {
+    get: operations['show_user_user_get']
+    post: operations['create_user_user_post']
+  }
+  '/users/{user_id}': {
+    get: operations['get_user_users__user_id__get']
+  }
+  '/roadmaps': {
+    post: operations['create_roadmap_roadmaps_post']
+  }
+  '/roadmaps/{roadmap_id}': {
+    get: operations['show_roadmap_roadmaps__roadmap_id__get']
+    patch: operations['patch_roadmap_roadmaps__roadmap_id__patch']
+  }
+  '/roadmaps/{roadmap_id}/favorite': {
+    post: operations['post_add_favorite_roadmaps__roadmap_id__favorite_post']
+    delete: operations['post_delete_favorite_roadmaps__roadmap_id__favorite_delete']
+  }
+  '/roadmaps/{roadmap_id}/vertex/{vertex_id}/achievement': {
+    post: operations['post_give_achievement_roadmaps__roadmap_id__vertex__vertex_id__achievement_post']
+    delete: operations['post_give_achievement_roadmaps__roadmap_id__vertex__vertex_id__achievement_delete']
+  }
+  '/search/roadmaps/{keyword}': {
+    get: operations['search_roadmap_search_roadmaps__keyword__get']
+  }
+  '/histories': {
+    get: operations['get_histories_histories_get']
+  }
+  '/favorites': {
+    get: operations['get_favorite_favorites_get']
+  }
+  '/recommend/roadmaps': {
+    get: operations['get_home_timeline_recommend_roadmaps_get']
+  }
+  '/home_timeline': {
+    get: operations['get_home_timeline_home_timeline_get']
+  }
+  '/': {
+    get: operations['read_root__get']
+  }
 }
 
 export interface components {
   schemas: {
+    /** BaseLinkVertex */
+    BaseLinkVertex: {
+      /** Id */
+      id: string
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'LINK'
+      /** X Coordinate */
+      x_coordinate: number
+      /** Y Coordinate */
+      y_coordinate: number
+      /** Title */
+      title: string
+      /** Content */
+      content: string
+      /** Link */
+      link: string
+    }
+    /** BaseVertex */
+    BaseVertex: {
+      /** Id */
+      id: string
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'DEFAULT'
+      /** X Coordinate */
+      x_coordinate: number
+      /** Y Coordinate */
+      y_coordinate: number
+      /** Title */
+      title: string
+      /** Content */
+      content: string
+    }
+    /** BaseYoutubeVertex */
+    BaseYoutubeVertex: {
+      /** Id */
+      id: string
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'YOUTUBE'
+      /** X Coordinate */
+      x_coordinate: number
+      /** Y Coordinate */
+      y_coordinate: number
+      /** Title */
+      title: string
+      /** Content */
+      content: string
+      /** Youtube Id */
+      youtube_id: string
+      /** Youtube Start */
+      youtube_start?: number
+      /** Youtube End */
+      youtube_end?: number
+    }
     /** CreateRoadmapRequest */
     CreateRoadmapRequest: {
       /** Title */
-      title: string;
+      title: string
       /** Tags */
-      tags: unknown[];
+      tags: string[]
       /** Edges */
-      edges: components["schemas"]["Edge"][];
+      edges: components['schemas']['Edge'][]
       /** Vertexes */
-      vertexes: components["schemas"]["Vertex"][];
-    };
-    /** CreateTask */
-    CreateTask: {
-      /** Name */
-      name: string;
-    };
+      vertexes: (
+        | components['schemas']['BaseVertex']
+        | components['schemas']['BaseYoutubeVertex']
+        | components['schemas']['BaseLinkVertex']
+      )[]
+      /** Locked */
+      locked: boolean
+      /** Thumbnail */
+      thumbnail?: string
+    }
     /** CreateUserRequest */
     CreateUserRequest: {
       /** Name */
-      name: string;
-    };
+      name: string
+    }
     /** Edge */
     Edge: {
       /** Id */
-      id: string;
+      id: string
       /** Source Id */
-      source_id: string;
+      source_id: string
       /** Target Id */
-      target_id: string;
+      target_id: string
       /** Is Solid Line */
-      is_solid_line: boolean;
-    };
+      is_solid_line: boolean
+    }
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
-      detail?: components["schemas"]["ValidationError"][];
-    };
+      detail?: components['schemas']['ValidationError'][]
+    }
+    /** LinkVertex */
+    LinkVertex: {
+      /** Id */
+      id: string
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'LINK'
+      /** X Coordinate */
+      x_coordinate: number
+      /** Y Coordinate */
+      y_coordinate: number
+      /** Title */
+      title: string
+      /** Content */
+      content: string
+      /** Link */
+      link: string
+      /** Achieved */
+      achieved: boolean
+      /** Ogp Url */
+      ogp_url?: string
+      /** Ogp Title */
+      ogp_title?: string
+      /** Ogp Description */
+      ogp_description?: string
+      /** Ogp Site Name */
+      ogp_site_name?: string
+      /** Ogp Image */
+      ogp_image?: string
+    }
     /** Roadmap */
     Roadmap: {
       /** Id */
-      id: string;
+      id: string
       /** Author Id */
-      author_id: string;
+      author_id: string
       /** Title */
-      title: string;
+      title: string
       /** Favorited */
-      favorited: boolean;
+      favorited: boolean
       /** Favorite Count */
-      favorite_count: number;
+      favorite_count: number
       /** Tags */
-      tags: unknown[];
+      tags: string[]
       /** Edges */
-      edges: components["schemas"]["Edge"][];
+      edges: components['schemas']['Edge'][]
       /** Vertexes */
-      vertexes: components["schemas"]["Vertex"][];
+      vertexes: (
+        | components['schemas']['Vertex']
+        | components['schemas']['LinkVertex']
+        | components['schemas']['YoutubeVertex']
+      )[]
+      /** Locked */
+      locked: boolean
+      /** Thumbnail */
+      thumbnail?: string
+      achievement?: components['schemas']['UserAchievement']
       /**
        * Created At
        * Format: date-time
        */
-      created_at: string;
+      created_at: string
       /**
        * Updated At
        * Format: date-time
        */
-      updated_at: string;
-    };
-    /** Task */
-    Task: {
-      /** Id */
-      id: string;
-      /** Name */
-      name: string;
-    };
+      updated_at: string
+    }
     /** UpdateRoadmapRequest */
     UpdateRoadmapRequest: {
       /** Title */
-      title?: string;
+      title?: string
       /** Tags */
-      tags?: unknown[];
+      tags?: unknown[]
       /** Edges */
-      edges?: components["schemas"]["Edge"][];
+      edges?: components['schemas']['Edge'][]
       /** Vertexes */
-      vertexes?: components["schemas"]["Vertex"][];
-    };
+      vertexes?: (
+        | components['schemas']['BaseVertex']
+        | components['schemas']['BaseYoutubeVertex']
+        | components['schemas']['BaseLinkVertex']
+      )[]
+      /** Locked */
+      locked?: boolean
+      /** Thumbnail */
+      thumbnail?: string
+    }
     /** User */
     User: {
       /** Id */
-      id: string;
+      id: string
       /** Name */
-      name: string;
+      name: string
       /**
        * Last Login At
        * Format: date-time
        */
-      last_login_at: string;
+      last_login_at: string
       /**
        * Created At
        * Format: date-time
        */
-      created_at: string;
+      created_at: string
       /**
        * Updated At
        * Format: date-time
        */
-      updated_at: string;
-    };
+      updated_at: string
+    }
+    /** UserAchievement */
+    UserAchievement: {
+      /** Roadmap Id */
+      roadmap_id: string
+      /** Rate */
+      rate: number
+      /** Vertex Ids */
+      vertex_ids: string[]
+    }
     /** ValidationError */
     ValidationError: {
       /** Location */
-      loc: (Partial<string> & Partial<number>)[];
+      loc: (Partial<string> & Partial<number>)[]
       /** Message */
-      msg: string;
+      msg: string
       /** Error Type */
-      type: string;
-    };
+      type: string
+    }
     /** Vertex */
     Vertex: {
       /** Id */
-      id: string;
-      /** title */
-      title: string;
-      /** summary */
-      summary: string;
-      /** url */
-      url: string;
-      /** from sec */
-      from_sec: number;
-      /** to sec */
-      to_sec: number;
+      id: string
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'DEFAULT'
       /** X Coordinate */
-      x_coordinate: number;
+      x_coordinate: number
       /** Y Coordinate */
-      y_coordinate: number;
-    };
-  };
+      y_coordinate: number
+      /** Title */
+      title: string
+      /** Content */
+      content: string
+      /** Achieved */
+      achieved: boolean
+    }
+    /** YoutubeVertex */
+    YoutubeVertex: {
+      /** Id */
+      id: string
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'YOUTUBE'
+      /** X Coordinate */
+      x_coordinate: number
+      /** Y Coordinate */
+      y_coordinate: number
+      /** Title */
+      title: string
+      /** Content */
+      content: string
+      /** Youtube Id */
+      youtube_id: string
+      /** Youtube Start */
+      youtube_start?: number
+      /** Youtube End */
+      youtube_end?: number
+      /** Achieved */
+      achieved: boolean
+    }
+  }
 }
 
 export interface operations {
-  show_tasks_get: {
-    responses: {
-      /** Successful Response */
-      200: {
-        content: {
-          "application/json": components["schemas"]["Task"][];
-        };
-      };
-    };
-  };
-  create_tasks_post: {
-    responses: {
-      /** Successful Response */
-      201: {
-        content: {
-          "application/json": unknown;
-        };
-      };
-      /** Validation Error */
-      422: {
-        content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-    requestBody: {
-      content: {
-        "application/json": components["schemas"]["CreateTask"];
-      };
-    };
-  };
   show_user_user_get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["User"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['User']
+        }
+      }
+    }
+  }
   create_user_user_post: {
     responses: {
       /** Successful Response */
-      201: unknown;
+      201: unknown
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateUserRequest"];
-      };
-    };
-  };
+        'application/json': components['schemas']['CreateUserRequest']
+      }
+    }
+  }
   get_user_users__user_id__get: {
     parameters: {
       path: {
-        user_id: string;
-      };
-    };
+        user_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-        };
-      };
+          'application/json': unknown
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   create_roadmap_roadmaps_post: {
     responses: {
       /** Successful Response */
-      201: unknown;
+      201: unknown
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["CreateRoadmapRequest"];
-      };
-    };
-  };
+        'application/json': components['schemas']['CreateRoadmapRequest']
+      }
+    }
+  }
   show_roadmap_roadmaps__roadmap_id__get: {
     parameters: {
       path: {
-        roadmap_id: string;
-      };
-    };
+        roadmap_id: string
+      }
+    }
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Roadmap"];
-        };
-      };
+          'application/json': components['schemas']['Roadmap']
+        }
+      }
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   patch_roadmap_roadmaps__roadmap_id__patch: {
     parameters: {
       path: {
-        roadmap_id: string;
-      };
-    };
+        roadmap_id: string
+      }
+    }
     responses: {
       /** Successful Response */
-      204: never;
+      204: never
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
     requestBody: {
       content: {
-        "application/json": components["schemas"]["UpdateRoadmapRequest"];
-      };
-    };
-  };
+        'application/json': components['schemas']['UpdateRoadmapRequest']
+      }
+    }
+  }
   post_add_favorite_roadmaps__roadmap_id__favorite_post: {
     parameters: {
       path: {
-        roadmap_id: string;
-      };
-    };
+        roadmap_id: string
+      }
+    }
     responses: {
       /** Successful Response */
-      204: never;
+      204: never
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   post_delete_favorite_roadmaps__roadmap_id__favorite_delete: {
     parameters: {
       path: {
-        roadmap_id: string;
-      };
-    };
+        roadmap_id: string
+      }
+    }
     responses: {
       /** Successful Response */
-      204: never;
+      204: never
       /** Validation Error */
       422: {
         content: {
-          "application/json": components["schemas"]["HTTPValidationError"];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  post_give_achievement_roadmaps__roadmap_id__vertex__vertex_id__achievement_post: {
+    parameters: {
+      path: {
+        roadmap_id: string
+        vertex_id: unknown
+      }
+    }
+    responses: {
+      /** Successful Response */
+      204: never
+      /** Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  post_give_achievement_roadmaps__roadmap_id__vertex__vertex_id__achievement_delete: {
+    parameters: {
+      path: {
+        roadmap_id: string
+        vertex_id: unknown
+      }
+    }
+    responses: {
+      /** Successful Response */
+      204: never
+      /** Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  search_roadmap_search_roadmaps__keyword__get: {
+    parameters: {
+      path: {
+        keyword: string
+      }
+    }
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          'application/json': unknown
+        }
+      }
+      /** Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  get_histories_histories_get: {
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Roadmap'][]
+        }
+      }
+    }
+  }
+  get_favorite_favorites_get: {
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Roadmap'][]
+        }
+      }
+    }
+  }
+  get_home_timeline_recommend_roadmaps_get: {
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Roadmap'][]
+        }
+      }
+    }
+  }
   get_home_timeline_home_timeline_get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": components["schemas"]["Roadmap"][];
-        };
-      };
-    };
-  };
+          'application/json': components['schemas']['Roadmap'][]
+        }
+      }
+    }
+  }
   read_root__get: {
     responses: {
       /** Successful Response */
       200: {
         content: {
-          "application/json": unknown;
-        };
-      };
-    };
-  };
+          'application/json': unknown
+        }
+      }
+    }
+  }
 }
 
 export interface external {}

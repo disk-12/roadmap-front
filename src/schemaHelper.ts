@@ -26,11 +26,21 @@ export type AxiosConfigWrapper<Path extends UrlPaths, Method extends HttpMethods
 }
 export function request<Path extends UrlPaths, Method extends HttpMethods>(
   config: AxiosConfigWrapper<Path, Method>,
-  id?: string
+  ids?: Record<`{${string}}`, string>
 ) {
+  const cf =
+    typeof ids === 'object'
+      ? {
+          ...config,
+          url: Object.entries(ids).reduce((url, id) => {
+            return url.replace(id[0], id[1])
+          }, config.url.toString()),
+        }
+      : config
+  console.log(cf)
   return axios.request<
     ResponseData<Path, Method>,
     AxiosResponse<ResponseData<Path, Method>>,
     AxiosConfigWrapper<Path, Method>['data']
-  >(typeof id === 'string' ? { ...config, url: config.url.replace(/{.*}/g, id) } : config)
+  >(cf)
 }

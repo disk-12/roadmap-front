@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { FC, ReactNode } from 'react'
 
-const fullScreenPage = ['/roadmap/make', '/roadmap/[roadmap_id]']
+const fullScreenPage = ['/roadmap/make', '/roadmap/read', '/roadmap/edit']
 export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   const router = useRouter()
   const isFull = fullScreenPage.includes(router.route)
@@ -17,11 +17,6 @@ export const Layout: FC<{ children: ReactNode }> = ({ children }) => {
       maxWidth={!isFull ? '720px' : '100%'}
       textAlign='center'
       margin='auto'
-      sx={{
-        backgroundImage:
-          'linear-gradient(0deg, transparent 31px, #ddd 32px), linear-gradient(90deg,  transparent 31px, #ddd 32px)',
-        backgroundSize: '32px 32px',
-      }}
     >
       {children}
       {!isFull && <Footer />}
@@ -46,7 +41,7 @@ const Footer = () => {
       {TabList.map((e, idx) => (
         <Box
           key={idx}
-          width='25%'
+          width='33%'
           py={1}
           sx={{
             transition: '0.2s',
@@ -80,5 +75,4 @@ const TabList = [
   { url: '/', title: 'ホーム', icon: faHome },
   { url: '/search', title: '検索', icon: faSearch },
   { url: '/my', title: 'マイページ', icon: faUser },
-  { url: '/notification', title: '通知', icon: faBell },
 ]

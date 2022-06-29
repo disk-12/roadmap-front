@@ -1,20 +1,25 @@
 import { Box, Tab, Tabs } from '@mui/material'
-import axios from 'axios'
+import { Header } from 'components/Header'
 import { RoadmapCard } from 'components/RoadmapCard'
 import dayjs from 'dayjs'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useQuery } from 'react-query'
-import { ResponseData } from 'schemaHelper'
+import { request } from 'schemaHelper'
 
 const MyPage: NextPage = () => {
   const [tab, setTab] = useState(0)
-  const { data } = useQuery('/favorites', () =>
-    axios.get<ResponseData<'/home_timeline', 'get'>>('/favorites').then(({ data }) => data)
+  const { data: favs } = useQuery('/favorites', () =>
+    request({ url: '/favorites', method: 'get' }).then(({ data }) => data)
   )
+  const { data: histories } = useQuery('/histories', () =>
+    request({ url: '/histories', method: 'get' }).then(({ data }) => data)
+  )
+
   return (
     <Box>
+      <Header title='マイページ' url='/my' />
       <Box bgcolor='white'>
         <Tabs value={tab} variant='fullWidth'>
           {TabList.map((e, idx) => (
@@ -31,12 +36,11 @@ const MyPage: NextPage = () => {
               </Box>
             </Link>
           </Box>
-          {data?.map((e) => (
+          {favs?.map((e) => (
             <RoadmapCard
               key={e.id}
               imgUrl={''}
               id={e.id}
-              summary={'summary'}
               title={e.title}
               favCount={e.favorite_count}
               createdAt={dayjs(e.created_at).format('YY-MM-DD')}
@@ -45,7 +49,16 @@ const MyPage: NextPage = () => {
         </>
       ) : (
         <Box m={1} p={1} bgcolor='white'>
-          後で作る
+          {histories?.map((e) => (
+            <RoadmapCard
+              key={e.id}
+              imgUrl={''}
+              id={e.id}
+              title={e.title}
+              favCount={e.favorite_count}
+              createdAt={dayjs(e.created_at).format('YY-MM-DD')}
+            />
+          ))}
         </Box>
       )}
     </Box>
