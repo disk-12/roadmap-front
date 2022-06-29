@@ -13,6 +13,7 @@ const dummyData: ResponseData<'/home_timeline', 'get'> = [
     vertexes: [],
     created_at: '',
     updated_at: '',
+    locked: true,
   },
 ]
 

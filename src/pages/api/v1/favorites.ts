@@ -11,6 +11,7 @@ const dummyData: ResponseData<'/home_timeline', 'get'> = [
     tags: [],
     edges: [],
     vertexes: [],
+    locked: false,
     created_at: '',
     updated_at: '',
   },

@@ -2,43 +2,9 @@
   "openapi": "3.0.2",
   "info": { "title": "FastAPI", "version": "0.1.0" },
   "paths": {
-    "/tasks": {
-      "get": {
-        "summary": "Show",
-        "operationId": "show_tasks_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Response Show Tasks Get",
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/Task" }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Create",
-        "operationId": "create_tasks_post",
-        "requestBody": {
-          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateTask" } } },
-          "required": true
-        },
-        "responses": {
-          "201": { "description": "Successful Response", "content": { "application/json": { "schema": {} } } },
-          "422": {
-            "description": "Validation Error",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
-          }
-        }
-      }
-    },
     "/user": {
       "get": {
+        "tags": ["users"],
         "summary": "Show User",
         "operationId": "show_user_user_get",
         "responses": {
@@ -50,6 +16,7 @@
         "security": [{ "HTTPBearer": [] }]
       },
       "post": {
+        "tags": ["users"],
         "summary": "Create User",
         "operationId": "create_user_user_post",
         "requestBody": {
@@ -68,6 +35,7 @@
     },
     "/users/{user_id}": {
       "get": {
+        "tags": ["users"],
         "summary": "Get User",
         "operationId": "get_user_users__user_id__get",
         "parameters": [
@@ -84,6 +52,7 @@
     },
     "/roadmaps": {
       "post": {
+        "tags": ["roadmaps"],
         "summary": "Create Roadmap",
         "operationId": "create_roadmap_roadmaps_post",
         "requestBody": {
@@ -102,6 +71,7 @@
     },
     "/roadmaps/{roadmap_id}": {
       "get": {
+        "tags": ["roadmaps"],
         "summary": "Show Roadmap",
         "operationId": "show_roadmap_roadmaps__roadmap_id__get",
         "parameters": [
@@ -125,6 +95,7 @@
         "security": [{ "HTTPBearer": [] }]
       },
       "patch": {
+        "tags": ["roadmaps"],
         "summary": "Patch Roadmap",
         "operationId": "patch_roadmap_roadmaps__roadmap_id__patch",
         "parameters": [
@@ -151,6 +122,7 @@
     },
     "/roadmaps/{roadmap_id}/favorite": {
       "post": {
+        "tags": ["roadmaps"],
         "summary": "Post Add Favorite",
         "operationId": "post_add_favorite_roadmaps__roadmap_id__favorite_post",
         "parameters": [
@@ -171,6 +143,7 @@
         "security": [{ "HTTPBearer": [] }]
       },
       "delete": {
+        "tags": ["roadmaps"],
         "summary": "Post Delete Favorite",
         "operationId": "post_delete_favorite_roadmaps__roadmap_id__favorite_delete",
         "parameters": [
@@ -191,8 +164,139 @@
         "security": [{ "HTTPBearer": [] }]
       }
     },
+    "/roadmaps/{roadmap_id}/vertex/{vertex_id}/achievement": {
+      "post": {
+        "tags": ["roadmaps"],
+        "summary": "Post Give Achievement",
+        "operationId": "post_give_achievement_roadmaps__roadmap_id__vertex__vertex_id__achievement_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "title": "Roadmap Id", "type": "string" },
+            "name": "roadmap_id",
+            "in": "path"
+          },
+          { "required": true, "schema": { "title": "Vertex Id" }, "name": "vertex_id", "in": "path" }
+        ],
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "422": {
+            "description": "Validation Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      },
+      "delete": {
+        "tags": ["roadmaps"],
+        "summary": "Post Give Achievement",
+        "operationId": "post_give_achievement_roadmaps__roadmap_id__vertex__vertex_id__achievement_delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": { "title": "Roadmap Id", "type": "string" },
+            "name": "roadmap_id",
+            "in": "path"
+          },
+          { "required": true, "schema": { "title": "Vertex Id" }, "name": "vertex_id", "in": "path" }
+        ],
+        "responses": {
+          "204": { "description": "Successful Response" },
+          "422": {
+            "description": "Validation Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/search/roadmaps/{keyword}": {
+      "get": {
+        "tags": ["roadmaps"],
+        "summary": "Search Roadmap",
+        "operationId": "search_roadmap_search_roadmaps__keyword__get",
+        "parameters": [
+          { "required": true, "schema": { "title": "Keyword", "type": "string" }, "name": "keyword", "in": "path" }
+        ],
+        "responses": {
+          "200": { "description": "Successful Response", "content": { "application/json": { "schema": {} } } },
+          "422": {
+            "description": "Validation Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/histories": {
+      "get": {
+        "tags": ["roadmaps"],
+        "summary": "Get Histories",
+        "operationId": "get_histories_histories_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Histories Histories Get",
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Roadmap" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/favorites": {
+      "get": {
+        "tags": ["roadmaps"],
+        "summary": "Get Favorite",
+        "operationId": "get_favorite_favorites_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Favorite Favorites Get",
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Roadmap" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/recommend/roadmaps": {
+      "get": {
+        "tags": ["roadmaps"],
+        "summary": "Get Home Timeline",
+        "operationId": "get_home_timeline_recommend_roadmaps_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Home Timeline Recommend Roadmaps Get",
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Roadmap" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
     "/home_timeline": {
       "get": {
+        "tags": ["roadmaps"],
         "summary": "Get Home Timeline",
         "operationId": "get_home_timeline_home_timeline_get",
         "responses": {
@@ -224,22 +328,71 @@
   },
   "components": {
     "schemas": {
+      "BaseLinkVertex": {
+        "title": "BaseLinkVertex",
+        "required": ["id", "type", "x_coordinate", "y_coordinate", "title", "content", "link"],
+        "type": "object",
+        "properties": {
+          "id": { "title": "Id", "type": "string" },
+          "type": { "title": "Type", "enum": ["LINK"], "type": "string" },
+          "x_coordinate": { "title": "X Coordinate", "type": "integer" },
+          "y_coordinate": { "title": "Y Coordinate", "type": "integer" },
+          "title": { "title": "Title", "type": "string" },
+          "content": { "title": "Content", "type": "string" },
+          "link": { "title": "Link", "type": "string" }
+        }
+      },
+      "BaseVertex": {
+        "title": "BaseVertex",
+        "required": ["id", "type", "x_coordinate", "y_coordinate", "title", "content"],
+        "type": "object",
+        "properties": {
+          "id": { "title": "Id", "type": "string" },
+          "type": { "title": "Type", "enum": ["DEFAULT"], "type": "string" },
+          "x_coordinate": { "title": "X Coordinate", "type": "integer" },
+          "y_coordinate": { "title": "Y Coordinate", "type": "integer" },
+          "title": { "title": "Title", "type": "string" },
+          "content": { "title": "Content", "type": "string" }
+        }
+      },
+      "BaseYoutubeVertex": {
+        "title": "BaseYoutubeVertex",
+        "required": ["id", "type", "x_coordinate", "y_coordinate", "title", "content", "youtube_id"],
+        "type": "object",
+        "properties": {
+          "id": { "title": "Id", "type": "string" },
+          "type": { "title": "Type", "enum": ["YOUTUBE"], "type": "string" },
+          "x_coordinate": { "title": "X Coordinate", "type": "integer" },
+          "y_coordinate": { "title": "Y Coordinate", "type": "integer" },
+          "title": { "title": "Title", "type": "string" },
+          "content": { "title": "Content", "type": "string" },
+          "youtube_id": { "title": "Youtube Id", "type": "string" },
+          "youtube_start": { "title": "Youtube Start", "type": "integer" },
+          "youtube_end": { "title": "Youtube End", "type": "integer" }
+        }
+      },
       "CreateRoadmapRequest": {
         "title": "CreateRoadmapRequest",
-        "required": ["title", "tags", "edges", "vertexes"],
+        "required": ["title", "tags", "edges", "vertexes", "locked"],
         "type": "object",
         "properties": {
           "title": { "title": "Title", "type": "string" },
-          "tags": { "title": "Tags", "type": "array", "items": {} },
+          "tags": { "title": "Tags", "type": "array", "items": { "type": "string" } },
           "edges": { "title": "Edges", "type": "array", "items": { "$ref": "#/components/schemas/Edge" } },
-          "vertexes": { "title": "Vertexes", "type": "array", "items": { "$ref": "#/components/schemas/Vertex" } }
+          "vertexes": {
+            "title": "Vertexes",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/BaseVertex" },
+                { "$ref": "#/components/schemas/BaseYoutubeVertex" },
+                { "$ref": "#/components/schemas/BaseLinkVertex" }
+              ]
+            }
+          },
+          "locked": { "title": "Locked", "type": "boolean" },
+          "thumbnail": { "title": "Thumbnail", "type": "string" }
         }
-      },
-      "CreateTask": {
-        "title": "CreateTask",
-        "required": ["name"],
-        "type": "object",
-        "properties": { "name": { "title": "Name", "type": "string" } }
       },
       "CreateUserRequest": {
         "title": "CreateUserRequest",
@@ -265,6 +418,26 @@
           "detail": { "title": "Detail", "type": "array", "items": { "$ref": "#/components/schemas/ValidationError" } }
         }
       },
+      "LinkVertex": {
+        "title": "LinkVertex",
+        "required": ["id", "type", "x_coordinate", "y_coordinate", "title", "content", "link", "achieved"],
+        "type": "object",
+        "properties": {
+          "id": { "title": "Id", "type": "string" },
+          "type": { "title": "Type", "enum": ["LINK"], "type": "string" },
+          "x_coordinate": { "title": "X Coordinate", "type": "integer" },
+          "y_coordinate": { "title": "Y Coordinate", "type": "integer" },
+          "title": { "title": "Title", "type": "string" },
+          "content": { "title": "Content", "type": "string" },
+          "link": { "title": "Link", "type": "string" },
+          "achieved": { "title": "Achieved", "type": "boolean" },
+          "ogp_url": { "title": "Ogp Url", "type": "string" },
+          "ogp_title": { "title": "Ogp Title", "type": "string" },
+          "ogp_description": { "title": "Ogp Description", "type": "string" },
+          "ogp_site_name": { "title": "Ogp Site Name", "type": "string" },
+          "ogp_image": { "title": "Ogp Image", "type": "string" }
+        }
+      },
       "Roadmap": {
         "title": "Roadmap",
         "required": [
@@ -276,6 +449,7 @@
           "tags",
           "edges",
           "vertexes",
+          "locked",
           "created_at",
           "updated_at"
         ],
@@ -286,18 +460,25 @@
           "title": { "title": "Title", "type": "string" },
           "favorited": { "title": "Favorited", "type": "boolean" },
           "favorite_count": { "title": "Favorite Count", "type": "integer" },
-          "tags": { "title": "Tags", "type": "array", "items": {} },
+          "tags": { "title": "Tags", "type": "array", "items": { "type": "string" } },
           "edges": { "title": "Edges", "type": "array", "items": { "$ref": "#/components/schemas/Edge" } },
-          "vertexes": { "title": "Vertexes", "type": "array", "items": { "$ref": "#/components/schemas/Vertex" } },
+          "vertexes": {
+            "title": "Vertexes",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/Vertex" },
+                { "$ref": "#/components/schemas/LinkVertex" },
+                { "$ref": "#/components/schemas/YoutubeVertex" }
+              ]
+            }
+          },
+          "locked": { "title": "Locked", "type": "boolean" },
+          "thumbnail": { "title": "Thumbnail", "type": "string" },
+          "achievement": { "$ref": "#/components/schemas/UserAchievement" },
           "created_at": { "title": "Created At", "type": "string", "format": "date-time" },
           "updated_at": { "title": "Updated At", "type": "string", "format": "date-time" }
         }
-      },
-      "Task": {
-        "title": "Task",
-        "required": ["id", "name"],
-        "type": "object",
-        "properties": { "id": { "title": "Id", "type": "string" }, "name": { "title": "Name", "type": "string" } }
       },
       "UpdateRoadmapRequest": {
         "title": "UpdateRoadmapRequest",
@@ -306,7 +487,19 @@
           "title": { "title": "Title", "type": "string" },
           "tags": { "title": "Tags", "type": "array", "items": {} },
           "edges": { "title": "Edges", "type": "array", "items": { "$ref": "#/components/schemas/Edge" } },
-          "vertexes": { "title": "Vertexes", "type": "array", "items": { "$ref": "#/components/schemas/Vertex" } }
+          "vertexes": {
+            "title": "Vertexes",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                { "$ref": "#/components/schemas/BaseVertex" },
+                { "$ref": "#/components/schemas/BaseYoutubeVertex" },
+                { "$ref": "#/components/schemas/BaseLinkVertex" }
+              ]
+            }
+          },
+          "locked": { "title": "Locked", "type": "boolean" },
+          "thumbnail": { "title": "Thumbnail", "type": "string" }
         }
       },
       "User": {
@@ -319,6 +512,16 @@
           "last_login_at": { "title": "Last Login At", "type": "string", "format": "date-time" },
           "created_at": { "title": "Created At", "type": "string", "format": "date-time" },
           "updated_at": { "title": "Updated At", "type": "string", "format": "date-time" }
+        }
+      },
+      "UserAchievement": {
+        "title": "UserAchievement",
+        "required": ["roadmap_id", "rate", "vertex_ids"],
+        "type": "object",
+        "properties": {
+          "roadmap_id": { "title": "Roadmap Id", "type": "string" },
+          "rate": { "title": "Rate", "type": "integer" },
+          "vertex_ids": { "title": "Vertex Ids", "type": "array", "items": { "type": "string" } }
         }
       },
       "ValidationError": {
@@ -337,17 +540,33 @@
       },
       "Vertex": {
         "title": "Vertex",
-        "required": ["id", "x_coordinate", "y_coordinate", "title", "summary", "url", "from_sec", "to_sec"],
+        "required": ["id", "type", "x_coordinate", "y_coordinate", "title", "content", "achieved"],
         "type": "object",
         "properties": {
           "id": { "title": "Id", "type": "string" },
-          "title": { "title": "title", "type": "string" },
-          "summary": { "title": "summary", "type": "string" },
-          "url": { "title": "url", "type": "string" },
-          "from_sec": { "title": "from sec", "type": "integer" },
-          "to_sec": { "title": "to sec", "type": "integer" },
+          "type": { "title": "Type", "enum": ["DEFAULT"], "type": "string" },
           "x_coordinate": { "title": "X Coordinate", "type": "integer" },
-          "y_coordinate": { "title": "Y Coordinate", "type": "integer" }
+          "y_coordinate": { "title": "Y Coordinate", "type": "integer" },
+          "title": { "title": "Title", "type": "string" },
+          "content": { "title": "Content", "type": "string" },
+          "achieved": { "title": "Achieved", "type": "boolean" }
+        }
+      },
+      "YoutubeVertex": {
+        "title": "YoutubeVertex",
+        "required": ["id", "type", "x_coordinate", "y_coordinate", "title", "content", "youtube_id", "achieved"],
+        "type": "object",
+        "properties": {
+          "id": { "title": "Id", "type": "string" },
+          "type": { "title": "Type", "enum": ["YOUTUBE"], "type": "string" },
+          "x_coordinate": { "title": "X Coordinate", "type": "integer" },
+          "y_coordinate": { "title": "Y Coordinate", "type": "integer" },
+          "title": { "title": "Title", "type": "string" },
+          "content": { "title": "Content", "type": "string" },
+          "youtube_id": { "title": "Youtube Id", "type": "string" },
+          "youtube_start": { "title": "Youtube Start", "type": "integer" },
+          "youtube_end": { "title": "Youtube End", "type": "integer" },
+          "achieved": { "title": "Achieved", "type": "boolean" }
         }
       }
     },

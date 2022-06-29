@@ -30,7 +30,7 @@ export const VideoBox: FC<{
     )
   }, [url, startSecond, endSecond, onEnd])
   return (
-    <Box width='100%' height='100%' textAlign='center'>
+    <Box maxWidth='100%' height='100%' textAlign='center' overflow='hidden'>
       {emb}
     </Box>
   )

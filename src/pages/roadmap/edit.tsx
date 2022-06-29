@@ -1,52 +1,55 @@
 import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Button, Dialog, FormControlLabel, IconButton, Radio, RadioGroup, TextField, Typography } from '@mui/material'
+import { Button, Dialog, IconButton, TextField, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import { GetServerSideProps, NextPage } from 'next'
-import { useState } from 'react'
-import { useRouter } from 'next/router'
-import { request, RequestData } from 'schemaHelper'
-import { useMutation } from 'react-query'
-import { LottieModal } from 'components/LottieModal'
-import { EditNodeModal } from 'components/NodeModal'
+import axios from 'axios'
 import { EditArea } from 'components/EditArea'
 import { Header } from 'components/Header'
+import { LottieModal } from 'components/LottieModal'
+import { EditNodeModal } from 'components/NodeModal'
+import { GetServerSideProps, NextPage } from 'next'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { useMutation } from 'react-query'
+import { request, RequestData, ResponseData } from 'schemaHelper'
 
 type Vertexes = RequestData<'/roadmaps', 'post'>['vertexes'][number]
 type Edges = RequestData<'/roadmaps', 'post'>['edges']
 
-const MakeRoadmap: NextPage = () => {
-  const [vertexList, setVertexList] = useState<Vertexes[]>([])
-  const [edgeList, setEdgeList] = useState<Edges>([])
+const EditRoadMap: NextPage<PageProps> = ({ data, id }) => {
+  const [vertexList, setVertexList] = useState<Vertexes[]>(data.vertexes)
+  const [edgeList, setEdgeList] = useState<Edges>(data.edges)
   const [modalData, setModalData] = useState<Vertexes | undefined>()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [tagText, setTagText] = useState<string>('')
   const [roadmapData, setRoadmapData] = useState<{ title: string; tags: string[] }>({
-    title: '',
-    tags: [],
+    title: data.title,
+    tags: data.tags,
   })
   const router = useRouter()
   const [postedData, setPostedData] = useState<{ title: string }>()
-  const [isLock, setIsLock] = useState(false)
 
-  const $post = useMutation<unknown, unknown, RequestData<'/roadmaps', 'post'>>(
+  const $patch = useMutation<unknown, unknown, RequestData<'/roadmaps/{roadmap_id}', 'patch'>>(
     async (params) => {
-      request({
-        url: '/roadmaps',
-        method: 'post',
-        data: params,
-      })
+      request(
+        {
+          url: '/roadmaps/{roadmap_id}',
+          method: 'patch',
+          data: params,
+        },
+        { '{roadmap_id}': id }
+      )
     },
     {
       onSuccess: () => {
-        setPostedData({ title: '投稿完了！' })
+        setPostedData({ title: '編集完了！' })
       },
     }
   )
 
   return (
     <>
-      <Header title='新規作成' url='/roadmap/make' />
+      <Header title={`編集 - ${data.title}`} url={`/roadmap/edit?id=${id}`} />
       <EditArea
         vertexList={vertexList}
         setVertexList={setVertexList}
@@ -59,16 +62,10 @@ const MakeRoadmap: NextPage = () => {
       <Dialog open={dialogOpen} maxWidth='sm' fullWidth>
         <Box bgcolor='#f5f5f5' p={2} display='flex' flexDirection='column' gap={2}>
           <Box color='red' fontSize='xx-small' display='flex' flexDirection='column' gap={0.25}>
-            {roadmapData.title === '' && <Typography>* タイトルを入力してください</Typography>}
             {vertexList.length === 0 && <Typography>* ノードを追加してください</Typography>}
             {vertexList.some((e) => e.title === '') && <Typography>* 編集不足のノードがあります</Typography>}
           </Box>
-          <TextField
-            placeholder='ロードマップのタイトルを入力'
-            fullWidth
-            value={roadmapData.title}
-            onChange={({ target }) => setRoadmapData(({ tags }) => ({ tags, title: target.value }))}
-          />
+          <Typography>{roadmapData.title}</Typography>
           <Box display='flex' gap={1} alignItems='center'>
             <TextField
               placeholder='タグを追加'
@@ -96,13 +93,6 @@ const MakeRoadmap: NextPage = () => {
               </Box>
             ))}
           </Box>
-          <RadioGroup value={String(isLock)} onChange={(e) => setIsLock(e.target.value === 'true')}>
-            <Box display='flex' gap={1} alignItems='center'>
-              <Typography>共同編集</Typography>
-              <FormControlLabel value='false' control={<Radio />} label='OK' />
-              <FormControlLabel value='true' control={<Radio />} label='無理' />
-            </Box>
-          </RadioGroup>
           <Box display='flex' gap={2} width='100%' justifyContent='space-evenly'>
             <Button variant='contained' color='inherit' onClick={() => setDialogOpen(false)} fullWidth>
               閉じる
@@ -114,12 +104,12 @@ const MakeRoadmap: NextPage = () => {
               variant='contained'
               color='primary'
               onClick={() =>
-                $post.mutate({
+                $patch.mutate({
                   title: roadmapData.title,
                   tags: roadmapData.tags,
                   edges: edgeList,
                   vertexes: vertexList,
-                  locked: isLock,
+                  locked: false,
                 })
               }
               fullWidth
@@ -127,16 +117,15 @@ const MakeRoadmap: NextPage = () => {
                 roadmapData.title === '' || vertexList.length === 0 || vertexList.some(({ title }) => title === '')
               }
             >
-              投稿する
+              編集完了
             </Button>
           </Box>
         </Box>
       </Dialog>
-      {/* todo: shareUrl */}
       {postedData && (
         <LottieModal
           shareText={`ロードマップ ${roadmapData.title} を投稿しました! | RoMa`}
-          shareUrl={''}
+          shareUrl={typeof window !== 'undefined' ? `${location.origin}/roadmap/read?id=${id}` : ''}
           onClose={() => router.push('/my')}
           title={postedData.title}
         />
@@ -145,4 +134,21 @@ const MakeRoadmap: NextPage = () => {
   )
 }
 
-export default MakeRoadmap
+export const getServerSideProps: GetServerSideProps<PageProps> = async (context) => {
+  const id = context.query.id as string
+  const origin = new URL(context.req.headers.referer || '').origin
+  const data = await axios
+    .get('/api/v1/map', {
+      params: { id },
+      baseURL: origin,
+    })
+    .then(({ data }) => data)
+  return { props: { data, id } }
+}
+
+type PageProps = {
+  data: ResponseData<'/roadmaps/{roadmap_id}', 'get'>
+  id: string
+}
+
+export default EditRoadMap

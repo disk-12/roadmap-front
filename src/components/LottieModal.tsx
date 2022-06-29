@@ -3,8 +3,14 @@ import Lottie, { Options } from 'react-lottie'
 import animationData from 'data/107653-trophy.json'
 import { Button, Dialog, Typography } from '@mui/material'
 import { Box } from '@mui/system'
+import { TwitterShareButton } from 'react-share'
 
-export const LottieModal: FC<{ title: string; onClose: () => void }> = ({ title, onClose }) => {
+export const LottieModal: FC<{ shareText: string; shareUrl: string; title: string; onClose: () => void }> = ({
+  title,
+  onClose,
+  shareText,
+  shareUrl,
+}) => {
   return (
     <Dialog open maxWidth='md' fullWidth>
       <Box bgcolor='#f5f5f5' display='flex' flexDirection='column' gap={2} width='100%' justifyContent='center' py={2}>
@@ -13,12 +19,16 @@ export const LottieModal: FC<{ title: string; onClose: () => void }> = ({ title,
           {title}
         </Typography>
         <Box display='flex' gap={1} width='90%' m='auto'>
-          <Button variant='contained' fullWidth>
-            シェアする
-          </Button>
-          <Button onClick={onClose} variant='contained' fullWidth color='inherit'>
-            閉じる
-          </Button>
+          <TwitterShareButton url={shareUrl} title={shareText} style={{ width: '50%' }}>
+            <Button variant='contained' fullWidth>
+              シェアする
+            </Button>
+          </TwitterShareButton>
+          <Box width='50%'>
+            <Button onClick={onClose} variant='contained' fullWidth color='inherit'>
+              閉じる
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Dialog>
