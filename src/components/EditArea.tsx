@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@mui/material'
 import { Box } from '@mui/system'
 import { Dispatch, FC, SetStateAction, useRef, useState } from 'react'
+import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { RequestData } from 'schemaHelper'
 import { Arrow } from './Arrow'
 import { NodeBox } from './NodeBox'
@@ -38,6 +39,35 @@ export const EditArea: FC<EditAreaProps> = ({
   const [nodeId, setNodeId] = useState(0)
   const [addLineTemp, setAddLineTemp] = useState<string | undefined>()
   const ref = useRef<HTMLDivElement | null>(null)
+
+  const isDraggingRef = useRef(false)
+  const onDragHandler = (e: DraggableEvent, data: DraggableData) => {
+    //ドラッグ時の処理
+    isDraggingRef.current = true
+  }
+
+  const onStopHandler = (e: Vertexes[number], data: DraggableData) => {
+    if (!isDraggingRef.current) {
+      //ノードをクリックしたときの処理
+      if (mode === 'addMainLine' || mode === 'addSubLine') addLineContents(e.id)
+      else if (mode === 'setNode') {
+        setModalData(e)
+      } else if (mode === 'delete') deleteVertex(e.id)
+    } else {
+      //ノードをドラッグしたときの処理
+      const index = vertexList.indexOf(e)
+
+      const newList = [...vertexList]
+      newList[index] = {
+        ...e,
+        x_coordinate: data.x,
+        y_coordinate: data.y,
+      }
+      setVertexList(newList)
+    }
+    isDraggingRef.current = false
+  }
+
   const addVertexListContents = (x: number, y: number) => {
     setVertexList((l) => [
       ...l,
@@ -98,10 +128,16 @@ export const EditArea: FC<EditAreaProps> = ({
         fontSize='small'
         ref={ref}
       >
-        <Box position='fixed' right={0} bottom={0} p={2} display='grid' onClick={(e) => e.stopPropagation()} gap={1} zIndex={11}>
-          <Button color='inherit' variant='contained' disabled>
-            <FontAwesomeIcon icon={faUpDownLeftRight} size='lg' />
-          </Button>
+        <Box
+          position='fixed'
+          right={0}
+          bottom={0}
+          p={2}
+          display='grid'
+          onClick={(e) => e.stopPropagation()}
+          gap={1}
+          zIndex={11}
+        >
           {optionList.map((e) => (
             <Button
               key={e.mode}
@@ -113,27 +149,28 @@ export const EditArea: FC<EditAreaProps> = ({
             </Button>
           ))}
         </Box>
-        {vertexList.map((e) => (
-          <NodeBox
-            key={e.id}
-            top={e.y_coordinate}
-            left={e.x_coordinate}
-            title={e.title === '' ? '新しいノード' : e.title}
-            p={1}
-            zIndex={1}
-            isActive={
-              e.title !== '' &&
-              ((e.type === 'YOUTUBE' && e.id !== '') || (e.type === 'LINK' && e.link !== '') || e.type === 'DEFAULT')
-            }
-            border={addLineTemp === e.id ? '1px dashed orange' : 'none'}
-            onClick={(f) => {
-              f.stopPropagation()
-              if (mode === 'addMainLine' || mode === 'addSubLine') addLineContents(e.id)
-              else if (mode === 'setNode') {
-                setModalData(e)
-              } else if (mode === 'delete') deleteVertex(e.id)
-            }}
-          />
+        {vertexList.map((e: Vertexes[number]) => (
+          <Draggable
+            position={{ x: e.x_coordinate, y: e.y_coordinate }}
+            onDrag={onDragHandler}
+            onStop={(event, data) => onStopHandler(e, data)}
+          >
+            <Box zIndex={10}>
+              <NodeBox
+                key={e.id}
+                zIndex={10}
+                title={e.title === '' ? '新しいノード' : e.title}
+                p={1}
+                isActive={
+                  e.title !== '' &&
+                  ((e.type === 'YOUTUBE' && e.id !== '') ||
+                    (e.type === 'LINK' && e.link !== '') ||
+                    e.type === 'DEFAULT')
+                }
+                border={addLineTemp === e.id ? '1px dashed orange' : 'none'}
+              />
+            </Box>
+          </Draggable>
         ))}
         {edgeList.map((e, idx) => {
           const fromNode = vertexList.find(({ id }) => id === e.source_id)

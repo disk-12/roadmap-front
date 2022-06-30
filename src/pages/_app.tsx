@@ -16,7 +16,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient())
   const [user, loading, error] = useAuthState(auth)
   useEffect(() => {
-    console.log(user)
     if (user) {
       setToken()
     }

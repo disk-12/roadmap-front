@@ -3,8 +3,8 @@ import { Box, BoxProps } from '@mui/system'
 
 type NodeBoxInterface = BoxProps & {
   title: string
-  top: number
-  left: number
+  top?: number
+  left?: number
   isActive: boolean
 }
 
