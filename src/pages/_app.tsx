@@ -7,14 +7,20 @@ import { API_ENDPOINT, MOCK_BEARER } from 'env'
 import 'reset.css'
 import 'day'
 
-import { auth } from "services/firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { auth, setToken } from 'services/firebase'
+import { useAuthState } from 'react-firebase-hooks/auth'
 
 axios.defaults.baseURL = API_ENDPOINT
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient())
- 
+  const [user, loading, error] = useAuthState(auth)
+  useEffect(() => {
+    console.log(user)
+    if (user) {
+      setToken()
+    }
+  }, [user])
 
   return (
     <QueryClientProvider client={queryClient}>
