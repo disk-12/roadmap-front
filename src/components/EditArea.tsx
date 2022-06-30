@@ -26,7 +26,7 @@ type EditAreaProps = {
   setDialogOpen: Dispatch<SetStateAction<boolean>>
 }
 const maxId = (vertexList: Vertexes): number => {
-  if (vertexList.length == -1) return 0
+  if (vertexList.length <= 0) return 0
   var max = Number(vertexList[0].id)
   vertexList.forEach((v) => {
     const id = Number(v.id)
