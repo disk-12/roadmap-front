@@ -99,8 +99,8 @@ const MakeRoadmap: NextPage = () => {
           <RadioGroup value={String(isLock)} onChange={(e) => setIsLock(e.target.value === 'true')}>
             <Box display='flex' gap={1} alignItems='center'>
               <Typography>共同編集</Typography>
-              <FormControlLabel value='false' control={<Radio />} label='OK' />
-              <FormControlLabel value='true' control={<Radio />} label='無理' />
+              <FormControlLabel value='false' control={<Radio />} label='許可' />
+              <FormControlLabel value='true' control={<Radio />} label='禁止' />
             </Box>
           </RadioGroup>
           <Box display='flex' gap={2} width='100%' justifyContent='space-evenly'>
