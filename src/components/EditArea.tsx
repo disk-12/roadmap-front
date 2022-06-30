@@ -5,7 +5,6 @@ import {
   faInfoCircle,
   faPenToSquare,
   faTrashCan,
-  faUpDownLeftRight,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@mui/material'
@@ -26,7 +25,15 @@ type EditAreaProps = {
   setModalData: Dispatch<SetStateAction<Vertexes[number] | undefined>>
   setDialogOpen: Dispatch<SetStateAction<boolean>>
 }
-
+const maxId = (vertexList: Vertexes): number => {
+  if (vertexList.length == -1) return 0
+  var max = Number(vertexList[0].id)
+  vertexList.forEach((v) => {
+    const id = Number(v.id)
+    if (id > max) max = id
+  })
+  return max
+}
 export const EditArea: FC<EditAreaProps> = ({
   vertexList,
   setVertexList,
@@ -36,7 +43,7 @@ export const EditArea: FC<EditAreaProps> = ({
   setDialogOpen,
 }) => {
   const [mode, setMode] = useState<'addNode' | 'addMainLine' | 'addSubLine' | 'setNode' | 'info' | 'delete'>('addNode')
-  const [nodeId, setNodeId] = useState(0)
+  const [nodeId, setNodeId] = useState(maxId(vertexList) + 1)
   const [addLineTemp, setAddLineTemp] = useState<string | undefined>()
   const ref = useRef<HTMLDivElement | null>(null)
 
@@ -167,7 +174,7 @@ export const EditArea: FC<EditAreaProps> = ({
                     (e.type === 'LINK' && e.link !== '') ||
                     e.type === 'DEFAULT')
                 }
-                border={addLineTemp === e.id ? '1px dashed orange' : 'none'}
+                border={addLineTemp === e.id ? '4px dashed orange' : 'none'}
               />
             </Box>
           </Draggable>
