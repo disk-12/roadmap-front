@@ -37,5 +37,5 @@ export const Arrow: FC<ArrowInterface> = ({ from, to, dashed, ...other }) => {
         borderRight: borderStyle,
         borderRadius: '100% 0 100% 0',
       }
-  return <Box {...other} {...p} position='absolute' {...border} zIndex='-10' />
+  return <Box {...other} {...p} position='absolute' {...border} zIndex='0' />
 }
