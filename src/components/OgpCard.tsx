@@ -29,7 +29,7 @@ export const OgpCard: FC<{
           )}
           {title || siteName ? (
             <Box p={1} display='flex' flexDirection='column' justifyContent='space-between'>
-              <Typography component='h2' fontSize='large' fontWeight='bold'>
+              <Typography component='h2' fontWeight='bold'>
                 {title}
               </Typography>
               <Typography p={1} fontSize='smaller' textAlign='right'>

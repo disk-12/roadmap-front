@@ -19,10 +19,18 @@ export const LottieModal: FC<{ shareText: string; shareUrl: string; title: strin
           {title}
         </Typography>
         <Box display='flex' gap={1} width='90%' m='auto'>
-          <TwitterShareButton url={shareUrl} title={shareText} style={{ width: '50%' }}>
-            <Button variant='contained' fullWidth>
-              シェアする
-            </Button>
+          <TwitterShareButton
+            url={shareUrl}
+            title={shareText}
+            style={{
+              width: '50%',
+              backgroundColor: 'blue',
+              color: 'white',
+              borderRadius: '4px',
+              boxShadow: '2px 5px #1f8cb01f',
+            }}
+          >
+            シェアする
           </TwitterShareButton>
           <Box width='50%'>
             <Button onClick={onClose} variant='contained' fullWidth color='inherit'>

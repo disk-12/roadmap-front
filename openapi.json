@@ -60,7 +60,39 @@
           "required": true
         },
         "responses": {
-          "201": { "description": "Successful Response" },
+          "201": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateRoadmapResponse" } } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
+          }
+        },
+        "security": [{ "HTTPBearer": [] }]
+      }
+    },
+    "/users/{author_id}/roadmaps": {
+      "get": {
+        "tags": ["users"],
+        "summary": "Show Roadmap",
+        "operationId": "show_roadmap_users__author_id__roadmaps_get",
+        "parameters": [
+          { "required": true, "schema": { "title": "Author Id", "type": "string" }, "name": "author_id", "in": "path" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Show Roadmap Users  Author Id  Roadmaps Get",
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Roadmap" }
+                }
+              }
+            }
+          },
           "422": {
             "description": "Validation Error",
             "content": { "application/json": { "schema": { "$ref": "#/components/schemas/HTTPValidationError" } } }
@@ -339,7 +371,12 @@
           "y_coordinate": { "title": "Y Coordinate", "type": "integer" },
           "title": { "title": "Title", "type": "string" },
           "content": { "title": "Content", "type": "string" },
-          "link": { "title": "Link", "type": "string" }
+          "link": { "title": "Link", "type": "string" },
+          "ogp_url": { "title": "Ogp Url", "type": "string" },
+          "ogp_title": { "title": "Ogp Title", "type": "string" },
+          "ogp_description": { "title": "Ogp Description", "type": "string" },
+          "ogp_site_name": { "title": "Ogp Site Name", "type": "string" },
+          "ogp_image": { "title": "Ogp Image", "type": "string" }
         }
       },
       "BaseVertex": {
@@ -394,6 +431,11 @@
           "thumbnail": { "title": "Thumbnail", "type": "string" }
         }
       },
+      "CreateRoadmapResponse": {
+        "title": "CreateRoadmapResponse",
+        "type": "object",
+        "properties": { "id": { "title": "Id", "type": "string" } }
+      },
       "CreateUserRequest": {
         "title": "CreateUserRequest",
         "required": ["name"],
@@ -430,12 +472,12 @@
           "title": { "title": "Title", "type": "string" },
           "content": { "title": "Content", "type": "string" },
           "link": { "title": "Link", "type": "string" },
-          "achieved": { "title": "Achieved", "type": "boolean" },
           "ogp_url": { "title": "Ogp Url", "type": "string" },
           "ogp_title": { "title": "Ogp Title", "type": "string" },
           "ogp_description": { "title": "Ogp Description", "type": "string" },
           "ogp_site_name": { "title": "Ogp Site Name", "type": "string" },
-          "ogp_image": { "title": "Ogp Image", "type": "string" }
+          "ogp_image": { "title": "Ogp Image", "type": "string" },
+          "achieved": { "title": "Achieved", "type": "boolean" }
         }
       },
       "Roadmap": {

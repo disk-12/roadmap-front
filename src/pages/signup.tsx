@@ -3,21 +3,19 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined'
 import { teal } from '@mui/material/colors'
 import { NextPage } from 'next'
 import { auth, setToken, translateErrorMessage } from 'services/firebase'
-import { useRouter } from 'next/router'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import axios from 'axios'
 import { useRef, useState } from 'react'
 import { FirebaseError } from 'firebase/app'
 
 const Login: NextPage = () => {
-  const router = useRouter()
   const emailRef = useRef<HTMLFormElement>()
   const passwordRef = useRef<HTMLFormElement>()
   const usernameRef = useRef<HTMLFormElement>()
   const [errorMsg, setErrorMsg] = useState<string | null>()
   const registerAccountHundler = () => {
     createUserWithEmailAndPassword(auth, emailRef.current?.value, passwordRef.current?.value)
-      .then((userCredential) => {
+      .then((_) => {
         setToken()
         if (!usernameRef.current?.value) axios.post('/user', { name: 'no name' }).then(({ data }) => data)
         else axios.post('/user', { name: usernameRef.current?.value }).then(({ data }) => data)

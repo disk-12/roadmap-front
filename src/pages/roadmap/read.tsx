@@ -2,7 +2,7 @@ import { Box } from '@mui/system'
 import { Button, Dialog, IconButton, Typography } from '@mui/material'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Arrow } from 'components/Arrow'
 import { NodeBox } from 'components/NodeBox'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -16,13 +16,14 @@ import axios from 'axios'
 import dayjs from 'dayjs'
 import { TwitterShareButton } from 'react-share'
 import { faTwitter } from '@fortawesome/free-brands-svg-icons'
+import { CLIENT_DOMAIN } from 'env'
 
 const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
   const router = useRouter()
   const [modalData, setModalData] = useState<
     ResponseData<'/roadmaps/{roadmap_id}', 'get'>['vertexes'][number] | undefined
   >()
-  const [achiveOpen, setAchiveOpen] = useState<{ persent: number; open: boolean; text: string }[]>()
+  const [achiveOpen, setAchiveOpen] = useState<{ persent: number; open: boolean; text: string } | null>()
 
   const { data = defaultData, refetch } = useQuery(['/api/get_single_roadmap', { id }], async () =>
     request({ url: '/roadmaps/{roadmap_id}', method: 'get' }, { '{roadmap_id}': id }).then(({ data }) => data)
@@ -40,7 +41,6 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
       onSuccess: () =>
         refetch().then(() => {
           setModalData(undefined)
-          checkAchive()
         }),
     }
   )
@@ -69,30 +69,28 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
 
   const nodeList = data.vertexes
   const arrowList = data.edges
-  const achievementPer = data.achievement?.rate || 0
   const someLoading = $postFav.isLoading || $deleteFav.isLoading || $postAchieve.isLoading
 
-  const checkAchive = useCallback(
-    (first?: true) => {
-      if (achievementPer === 50)
-        setTimeout(() => setAchiveOpen((l) => [...(l || []), { persent: 50, open: !first, text: '50% 達成!' }]), 1000)
-      else if (achievementPer === 100)
-        setTimeout(() => setAchiveOpen((l) => [...(l || []), { persent: 100, open: !first, text: '100% 達成!' }]), 1000)
-      else if (!achiveOpen) setAchiveOpen([])
-    },
-    [achievementPer, setAchiveOpen, achiveOpen]
-  )
+  const achievementPer = data.achievement?.rate || 0
+  const checkAchive = () => {
+    const isFirst = achiveOpen === undefined
+    if (achievementPer === 100 && (!achiveOpen || achiveOpen.persent !== 100))
+      setTimeout(() => setAchiveOpen({ persent: 100, open: !isFirst, text: '100% 達成!' }), 750)
+    else if (achievementPer >= 50 && (!achiveOpen || achiveOpen.persent < 50))
+      setTimeout(() => setAchiveOpen({ persent: 50, open: !isFirst, text: '50% 達成!' }), 750)
+    else if (achiveOpen === undefined) setAchiveOpen(null)
+  }
 
   useEffect(() => {
-    data.achievement !== undefined && checkAchive(true)
-  }, [data.achievement, checkAchive])
+    checkAchive()
+  }, [achievementPer])
 
   return (
     <Box textAlign='left' width='100%' height='100%' display='flex' flexDirection='column'>
       <Header title={data.title} url={`/roadmap/read?id=${id}`} />
       <Box width='100%' maxWidth='500px' mx='auto' display='flex' justifyContent='space-between' bgcolor='white'>
         <Box p={2} onClick={(e) => e.stopPropagation()} display='grid' gap={1}>
-          <Typography fontWeight='bold' component='h1' fontSize='xx-large'>
+          <Typography fontWeight='bold' component='h1'>
             {data.title}
           </Typography>
           <Typography>最終更新日: {dayjs(data.updated_at).format('YYYY/MM/DD')}</Typography>
@@ -104,15 +102,15 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
           </Box>
         </Box>
         <Box display='grid' gridTemplateColumns={'1fr 1fr'} gap={1} p={1} alignItems='center'>
-          <IconButton color='primary'>
+          <Box color='blue' width='100%' textAlign='center'>
             <TwitterShareButton
               title={`${data.title} | RoMa`}
               url={typeof window !== 'undefined' ? location?.href : ''}
               disabled={someLoading}
             >
-              <FontAwesomeIcon icon={faTwitter} size='1x' />
+              <FontAwesomeIcon icon={faTwitter} size='2x' />
             </TwitterShareButton>
-          </IconButton>
+          </Box>
           <IconButton
             color='primary'
             onClick={() => router.push(`/roadmap/edit?id=${id}`)}
@@ -172,7 +170,7 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
         <Dialog open maxWidth='md' fullWidth>
           <Box>
             <Box mr={'auto'} p={2} display='flex' alignItems='center' justifyContent='space-between'>
-              <Typography fontWeight='bold' component='h2' fontSize='large'>
+              <Typography fontWeight='bold' component='h2'>
                 {modalData.title}
               </Typography>
               <Button color='error' variant='outlined' onClick={() => setModalData(undefined)}>
@@ -185,19 +183,17 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
               postEndRequest={() => $postAchieve.mutate(modalData.id)}
             />
             <Box px={3} py={1}>
-              <Typography py={1} fontSize='smaller'>
-                {modalData.content}
-              </Typography>
+              <Typography py={1}>{modalData.content}</Typography>
             </Box>
           </Box>
         </Dialog>
       )}
-      {achiveOpen && achiveOpen?.length !== 0 && achiveOpen[achiveOpen.length - 1].open && (
+      {achiveOpen?.open && (
         <LottieModal
           shareText={`${data.title} | RoMa`}
           shareUrl={typeof window !== 'undefined' ? location.href : ''}
-          title={achiveOpen[achiveOpen.length - 1].text}
-          onClose={() => setAchiveOpen(achiveOpen.map((e) => (e.open ? { ...e, open: false } : e)))}
+          title={achiveOpen.text}
+          onClose={() => setAchiveOpen({ ...achiveOpen, open: false })}
         />
       )}
     </Box>
@@ -206,11 +202,10 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async (context) => {
   const id = context.query.id as string
-  const origin = new URL(context.req.headers?.referer || '').origin
   const data = await axios
     .get('/api/v1/map', {
       params: { id },
-      baseURL: origin,
+      baseURL: CLIENT_DOMAIN,
     })
     .then(({ data }) => data)
   return { props: { data, id } }
