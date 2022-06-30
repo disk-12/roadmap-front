@@ -2,7 +2,7 @@ import { faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button, Dialog, FormControlLabel, IconButton, Radio, RadioGroup, TextField, Typography } from '@mui/material'
 import { Box } from '@mui/system'
-import { GetServerSideProps, NextPage } from 'next'
+import { NextPage } from 'next'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { request, RequestData } from 'schemaHelper'
@@ -28,6 +28,7 @@ const MakeRoadmap: NextPage = () => {
   const router = useRouter()
   const [postedData, setPostedData] = useState<{ title: string }>()
   const [isLock, setIsLock] = useState(false)
+  const [shareId, setShareId] = useState('')
 
   const $post = useMutation<unknown, unknown, RequestData<'/roadmaps', 'post'>>(
     async (params) => {
@@ -35,7 +36,7 @@ const MakeRoadmap: NextPage = () => {
         url: '/roadmaps',
         method: 'post',
         data: params,
-      })
+      }).then(({ data }) => setShareId(((data as any).id as string) || ''))
     },
     {
       onSuccess: () => {
@@ -120,6 +121,10 @@ const MakeRoadmap: NextPage = () => {
                   edges: edgeList,
                   vertexes: vertexList,
                   locked: isLock,
+                  thumbnail: (() => {
+                    const v = vertexList.find(({ type }) => type === 'YOUTUBE')
+                    return v?.type === 'YOUTUBE' ? v.youtube_id : undefined
+                  })(),
                 })
               }
               fullWidth
@@ -132,11 +137,10 @@ const MakeRoadmap: NextPage = () => {
           </Box>
         </Box>
       </Dialog>
-      {/* todo: shareUrl */}
       {postedData && (
         <LottieModal
           shareText={`ロードマップ ${roadmapData.title} を投稿しました! | RoMa`}
-          shareUrl={''}
+          shareUrl={typeof window !== 'undefined' ? `${location.origin}/roadmap/read?id=${shareId}` : ''}
           onClose={() => router.push('/my')}
           title={postedData.title}
         />

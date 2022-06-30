@@ -37,7 +37,6 @@ export function request<Path extends UrlPaths, Method extends HttpMethods>(
           }, config.url.toString()),
         }
       : config
-  console.log(cf)
   return axios.request<
     ResponseData<Path, Method>,
     AxiosResponse<ResponseData<Path, Method>>,

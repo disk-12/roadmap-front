@@ -7,6 +7,7 @@ import { EditArea } from 'components/EditArea'
 import { Header } from 'components/Header'
 import { LottieModal } from 'components/LottieModal'
 import { EditNodeModal } from 'components/NodeModal'
+import { CLIENT_DOMAIN } from 'env'
 import { GetServerSideProps, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -110,6 +111,10 @@ const EditRoadMap: NextPage<PageProps> = ({ data, id }) => {
                   edges: edgeList,
                   vertexes: vertexList,
                   locked: false,
+                  thumbnail: (() => {
+                    const v = vertexList.find(({ type }) => type === 'YOUTUBE')
+                    return v?.type === 'YOUTUBE' ? v.youtube_id : undefined
+                  })(),
                 })
               }
               fullWidth
@@ -136,11 +141,10 @@ const EditRoadMap: NextPage<PageProps> = ({ data, id }) => {
 
 export const getServerSideProps: GetServerSideProps<PageProps> = async (context) => {
   const id = context.query.id as string
-  const origin = new URL(context.req.headers.referer || '').origin
   const data = await axios
     .get('/api/v1/map', {
       params: { id },
-      baseURL: origin,
+      baseURL: CLIENT_DOMAIN,
     })
     .then(({ data }) => data)
   return { props: { data, id } }

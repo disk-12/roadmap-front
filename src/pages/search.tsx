@@ -1,6 +1,6 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Button, Tab, Tabs, TextField } from '@mui/material'
+import { Button, TextField } from '@mui/material'
 import { Box } from '@mui/system'
 import { Header } from 'components/Header'
 import { RoadmapCard } from 'components/RoadmapCard'
@@ -12,7 +12,6 @@ import { components } from 'schema'
 import { request } from 'schemaHelper'
 
 const SearchPage: NextPage = () => {
-  const [tab, setTab] = useState(0)
   const [searchText, setSearchText] = useState('')
   const [data, setData] = useState<components['schemas']['Roadmap'][]>([])
 
@@ -28,30 +27,20 @@ const SearchPage: NextPage = () => {
   return (
     <Box display='flex' flexDirection='column'>
       <Header title='検索' url='/search' />
-      <Box bgcolor='white'>
-        <Tabs value={tab} variant='fullWidth'>
-          {['キーワード', 'タグ'].map((e, idx) => (
-            <Tab label={e} onClick={() => setTab(idx)} key={idx} />
-          ))}
-        </Tabs>
-      </Box>
-      <Box bgcolor='white' width='95%' display='flex' mx='auto' my={1}>
-        <TextField
-          variant='outlined'
-          size='small'
-          value={searchText}
-          placeholder={tab === 0 ? 'キーワードで検索' : 'タグで検索 (作ってない)'}
-          fullWidth
-          onChange={({ target }) => setSearchText(target.value)}
-        />
-        <Button
-          onClick={() => mutate(searchText)}
-          color='primary'
-          variant='contained'
-          disabled={tab === 1 || searchText === ''}
-        >
-          <FontAwesomeIcon icon={faSearch} />
-        </Button>
+      <Box bgcolor='white' width='100%' mx='auto' position='sticky' top={0}>
+        <Box display='flex' p={1}>
+          <TextField
+            variant='outlined'
+            size='small'
+            value={searchText}
+            placeholder={'キーワードで検索'}
+            fullWidth
+            onChange={({ target }) => setSearchText(target.value)}
+          />
+          <Button onClick={() => mutate(searchText)} color='primary' variant='contained' disabled={searchText === ''}>
+            <FontAwesomeIcon icon={faSearch} />
+          </Button>
+        </Box>
       </Box>
       <Box flexGrow={1} display='flex' flexDirection='column'>
         {data.map((e) => (

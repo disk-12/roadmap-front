@@ -21,36 +21,36 @@ const Home: NextPage = () => {
   return (
     <Box>
       <Header url='/' />
-      <Box bgcolor='white'>
+      <Box bgcolor='white' position='sticky' top='0'>
         <Tabs value={tab} variant='fullWidth'>
           {['新着', 'おすすめ'].map((e, idx) => (
             <Tab label={e} onClick={() => setTab(idx)} key={idx} />
           ))}
         </Tabs>
       </Box>
-      {tab === 0
-        ? data?.map((e) => (
-            /* TODO: サムネどうする？ */
-            <RoadmapCard
-              key={e.id}
-              imgUrl={''}
-              id={e.id}
-              title={e.title}
-              favCount={e.favorite_count}
-              createdAt={dayjs(e.created_at).format('YY-MM-DD')}
-            />
-          ))
-        : recommendData?.map((e) => (
-            /* TODO: サムネどうする？ */
-            <RoadmapCard
-              key={e.id}
-              imgUrl={''}
-              id={e.id}
-              title={e.title}
-              favCount={e.favorite_count}
-              createdAt={dayjs(e.created_at).format('YY-MM-DD')}
-            />
-          ))}
+      <Box display='flex' flexDirection='column' gap={1} my={1}>
+        {tab === 0
+          ? data?.map((e) => (
+              <RoadmapCard
+                key={e.id}
+                imgUrl={e.thumbnail}
+                id={e.id}
+                title={e.title}
+                favCount={e.favorite_count}
+                createdAt={dayjs(e.created_at).format('YY-MM-DD')}
+              />
+            ))
+          : recommendData?.map((e) => (
+              <RoadmapCard
+                key={e.id}
+                imgUrl={e.thumbnail}
+                id={e.id}
+                title={e.title}
+                favCount={e.favorite_count}
+                createdAt={dayjs(e.created_at).format('YY-MM-DD')}
+              />
+            ))}
+      </Box>
     </Box>
   )
 }

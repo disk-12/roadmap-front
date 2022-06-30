@@ -14,6 +14,9 @@ export interface paths {
   '/roadmaps': {
     post: operations['create_roadmap_roadmaps_post']
   }
+  '/users/{author_id}/roadmaps': {
+    get: operations['show_roadmap_users__author_id__roadmaps_get']
+  }
   '/roadmaps/{roadmap_id}': {
     get: operations['show_roadmap_roadmaps__roadmap_id__get']
     patch: operations['patch_roadmap_roadmaps__roadmap_id__patch']
@@ -67,6 +70,16 @@ export interface components {
       content: string
       /** Link */
       link: string
+      /** Ogp Url */
+      ogp_url?: string
+      /** Ogp Title */
+      ogp_title?: string
+      /** Ogp Description */
+      ogp_description?: string
+      /** Ogp Site Name */
+      ogp_site_name?: string
+      /** Ogp Image */
+      ogp_image?: string
     }
     /** BaseVertex */
     BaseVertex: {
@@ -129,6 +142,11 @@ export interface components {
       /** Thumbnail */
       thumbnail?: string
     }
+    /** CreateRoadmapResponse */
+    CreateRoadmapResponse: {
+      /** Id */
+      id?: string
+    }
     /** CreateUserRequest */
     CreateUserRequest: {
       /** Name */
@@ -169,8 +187,6 @@ export interface components {
       content: string
       /** Link */
       link: string
-      /** Achieved */
-      achieved: boolean
       /** Ogp Url */
       ogp_url?: string
       /** Ogp Title */
@@ -181,6 +197,8 @@ export interface components {
       ogp_site_name?: string
       /** Ogp Image */
       ogp_image?: string
+      /** Achieved */
+      achieved: boolean
     }
     /** Roadmap */
     Roadmap: {
@@ -380,7 +398,11 @@ export interface operations {
   create_roadmap_roadmaps_post: {
     responses: {
       /** Successful Response */
-      201: unknown
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateRoadmapResponse']
+        }
+      }
       /** Validation Error */
       422: {
         content: {
@@ -391,6 +413,27 @@ export interface operations {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateRoadmapRequest']
+      }
+    }
+  }
+  show_roadmap_users__author_id__roadmaps_get: {
+    parameters: {
+      path: {
+        author_id: string
+      }
+    }
+    responses: {
+      /** Successful Response */
+      200: {
+        content: {
+          'application/json': components['schemas']['Roadmap'][]
+        }
+      }
+      /** Validation Error */
+      422: {
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
       }
     }
   }

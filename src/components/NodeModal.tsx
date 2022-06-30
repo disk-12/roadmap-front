@@ -18,7 +18,7 @@ export const ReadNodeModal: FC<{
     <Dialog open maxWidth='md' fullWidth>
       <Box>
         <Box mr={'auto'} p={2} display='flex' alignItems='center' justifyContent='space-between'>
-          <Typography fontWeight='bold' component='h2' fontSize='large'>
+          <Typography fontWeight='bold' component='h2'>
             {modalData.title}
           </Typography>
           <Button color='error' variant='outlined' onClick={() => setModalData(undefined)}>
@@ -34,7 +34,14 @@ export const ReadNodeModal: FC<{
               onEnd={() => postEndRequest()}
             />
           ) : (
-            modalData.type === 'LINK' && <Box>{modalData.link}</Box>
+            modalData.type === 'LINK' && (
+              <OgpCard
+                image={modalData.ogp_image}
+                url={modalData.link}
+                siteName={modalData.ogp_site_name}
+                title={modalData.ogp_title}
+              />
+            )
           )}
         </Box>
         <Box px={3} py={1}>
@@ -43,9 +50,15 @@ export const ReadNodeModal: FC<{
           </Typography>
         </Box>
         <Box justifyContent='flex-end' display='flex' p={1}>
-          <Button onClick={() => postEndRequest()} variant='contained'>
-            学習完了
-          </Button>
+          {modalData.achieved ? (
+            <Button disabled variant='contained' color="success">
+              学習済み
+            </Button>
+          ) : (
+            <Button onClick={() => postEndRequest()} variant='contained'>
+              学習完了
+            </Button>
+          )}
         </Box>
       </Box>
     </Dialog>
@@ -61,10 +74,7 @@ export const EditNodeModal: FC<{
     modalData.type === 'YOUTUBE' ? modalData.youtube_id ?? '' : modalData.type === 'LINK' ? modalData.link ?? '' : ''
   )
 
-  const {
-    data: ogp,
-    refetch,
-  } = useQuery(
+  const { data: ogp, refetch } = useQuery(
     ['/api/v1/ogp', editingUrl],
     async () =>
       await axios
@@ -182,7 +192,19 @@ export const EditNodeModal: FC<{
                 size='small'
                 fullWidth
               />
-              <IconButton onClick={() => refetch().then(() => setModalData({ ...modalData, link: editingUrl }))}>
+              <IconButton
+                onClick={() =>
+                  refetch().then(() =>
+                    setModalData({
+                      ...modalData,
+                      link: editingUrl,
+                      ogp_image: ogp?.image,
+                      ogp_title: ogp?.title,
+                      ogp_site_name: ogp?.siteName,
+                    })
+                  )
+                }
+              >
                 <FontAwesomeIcon icon={faSearch} />
               </IconButton>
             </Box>

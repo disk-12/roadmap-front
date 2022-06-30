@@ -9,7 +9,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@mui/material'
 import { Box } from '@mui/system'
-import { relative } from 'path'
 import { Dispatch, FC, SetStateAction, useRef, useState } from 'react'
 import Draggable, { DraggableData, DraggableEvent } from 'react-draggable'
 import { RequestData } from 'schemaHelper'
@@ -161,7 +160,8 @@ export const EditArea: FC<EditAreaProps> = ({
           <Draggable
             position={{ x: e.x_coordinate, y: e.y_coordinate }}
             onDrag={onDragHandler}
-            onStop={(event, data) => onStopHandler(e, data)}
+            onStop={(_, data) => onStopHandler(e, data)}
+            key={e.id}
           >
             <Box zIndex={10}>
               <NodeBox
@@ -191,7 +191,6 @@ export const EditArea: FC<EditAreaProps> = ({
               to={{ x: toNode.x_coordinate, y: toNode.y_coordinate }}
               dashed={e.is_solid_line}
               onClick={(ele) => {
-                console.log('aaaa')
                 ele.stopPropagation()
                 setEdgeList((l) =>
                   l.filter(({ source_id, target_id }) => e.source_id !== source_id || e.target_id !== target_id)

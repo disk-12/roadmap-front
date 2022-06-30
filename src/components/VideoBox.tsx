@@ -9,7 +9,6 @@ export const VideoBox: FC<{
   onEnd: () => void
 }> = ({ url, startSecond, endSecond, onEnd }) => {
   const [emb, setEmb] = useState<ReactNode>(<>loading...</>)
-  console.log(startSecond, endSecond)
   useEffect(() => {
     setEmb(
       <ReactPlayer

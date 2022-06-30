@@ -1,33 +1,58 @@
 import axios from 'axios'
 import type { AppProps } from 'next/app'
 import { Layout } from 'components/__layout__'
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { useEffect, useState } from 'react'
-import { API_ENDPOINT, MOCK_BEARER } from 'env'
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+import { FC, ReactNode, useEffect, useState } from 'react'
+import { API_ENDPOINT } from 'env'
+import { auth, setToken } from 'services/firebase'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { request } from 'schemaHelper'
+import { UserContext } from 'context'
+import { ThemeProvider } from '@emotion/react'
+import { CssBaseline } from '@mui/material'
+import { createTheme } from '@mui/material'
 import 'reset.css'
 import 'day'
 
-import { auth, setToken } from 'services/firebase'
-import { useAuthState } from 'react-firebase-hooks/auth'
-
 axios.defaults.baseURL = API_ENDPOINT
+
+const theme = createTheme({
+  typography: {
+    fontSize: 12,
+    h1: { fontSize: 16 },
+    h2: { fontSize: 15 },
+    h3: { fontSize: 14 },
+    h4: { fontSize: 13 },
+  },
+})
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(() => new QueryClient())
-  const [user, loading, error] = useAuthState(auth)
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <QueryClientProvider client={queryClient}>
+        <UserWrapper>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </UserWrapper>
+      </QueryClientProvider>
+    </ThemeProvider>
+  )
+}
+
+const UserWrapper: FC<{ children: ReactNode }> = ({ children }) => {
+  const [user] = useAuthState(auth)
   useEffect(() => {
     if (user) {
       setToken()
     }
   }, [user])
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </QueryClientProvider>
+  const { data } = useQuery(['/user', { user }], () =>
+    user ? request({ url: '/user', method: 'get' }).then(({ data }) => data) : undefined
   )
+  return <UserContext.Provider value={data}>{children}</UserContext.Provider>
 }
 
 export default MyApp
