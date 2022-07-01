@@ -6,11 +6,10 @@ import { getAuth } from 'firebase/auth'
 const app = !getApps().length ? initializeApp(FIREBASE_CONFIG) : getApps()[0]
 const auth = getAuth(app)
 
-const setToken = () => {
+const setToken = async () => {
   if (auth.currentUser) {
-    auth.currentUser.getIdToken(true).then((idToken) => {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`
-    })
+    const idToken = await auth.currentUser.getIdToken(true)
+    axios.defaults.headers.common['Authorization'] = `Bearer ${idToken}`
   }
 }
 
