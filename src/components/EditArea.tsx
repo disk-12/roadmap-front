@@ -163,7 +163,7 @@ export const EditArea: FC<EditAreaProps> = ({
             onStop={(_, data) => onStopHandler(e, data)}
             key={e.id}
           >
-            <Box zIndex={10}>
+            <Box zIndex={10} sx={{ position: 'absolute' }}>
               <NodeBox
                 key={e.id}
                 zIndex={10}
