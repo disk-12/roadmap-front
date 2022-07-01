@@ -7,18 +7,18 @@ import { createUserWithEmailAndPassword } from 'firebase/auth'
 import axios from 'axios'
 import { useRef, useState } from 'react'
 import { FirebaseError } from 'firebase/app'
+import { useRouter } from 'next/router'
 
 const Login: NextPage = () => {
   const emailRef = useRef<HTMLFormElement>()
   const passwordRef = useRef<HTMLFormElement>()
   const usernameRef = useRef<HTMLFormElement>()
   const [errorMsg, setErrorMsg] = useState<string | null>()
+  const router = useRouter()
   const registerAccountHundler = () => {
     createUserWithEmailAndPassword(auth, emailRef.current?.value, passwordRef.current?.value)
       .then((_) => {
-        setToken()
-        if (!usernameRef.current?.value) axios.post('/user', { name: 'no name' }).then(({ data }) => data)
-        else axios.post('/user', { name: usernameRef.current?.value }).then(({ data }) => data)
+        setToken().then(() => axios.post('/user', { name: usernameRef.current?.value }).then(() => router.push('/my')))
       })
       .catch((error) => {
         if (error instanceof FirebaseError) {

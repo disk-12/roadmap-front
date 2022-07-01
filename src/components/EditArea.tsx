@@ -152,7 +152,8 @@ export const EditArea: FC<EditAreaProps> = ({
               variant='contained'
               onClick={() => (e.mode === 'info' ? setDialogOpen(true) : setMode(e.mode))}
             >
-              <FontAwesomeIcon icon={e.icon} size='lg' />
+              {e.icon != faArrowUpRightDots && <FontAwesomeIcon icon={e.icon} size='lg' />}
+              {e.icon == faArrowUpRightDots && <img src='/DashedUpper.svg' alt='Icon' width='11.5px' height='15px' />}
             </Button>
           ))}
         </Box>

@@ -20,7 +20,7 @@ const Login: NextPage = () => {
       try {
         await signInWithEmailAndPassword(auth, email, password).then(() => {
           setErrorMsg(null)
-          router.push('/my')
+          setToken().then(() => router.push('/my'))
         })
       } catch (error) {
         if (error instanceof FirebaseError) {
