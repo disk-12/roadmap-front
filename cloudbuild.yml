@@ -1,0 +1,18 @@
+steps:
+  - id: setting_env
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        echo "$_ENV" > .env
+  - id: build_frontend
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-f', 'Dockerfile', '-t', '$_APP_CONTAINER_REGION/$PROJECT_ID/$_SERVICE_NAME/$COMMIT_SHA', '.']
+  - id: push_container
+    name: 'gcr.io/cloud-builders/docker'
+    dir: .
+    args: ['push', '$_APP_CONTAINER_REGION/$PROJECT_ID/$_SERVICE_NAME/$COMMIT_SHA']
+images:
+  - '$_APP_CONTAINER_REGION/$PROJECT_ID/$_SERVICE_NAME/$COMMIT_SHA'
+timeout: 2000s
