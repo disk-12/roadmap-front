@@ -150,7 +150,7 @@ export const EditNodeModal: FC<{
                     try {
                       return new URL(editingUrl).searchParams.get('v')
                     } catch (_) {
-                      return editingUrl
+                      return editingUrl.split('youtu.be/').length === 2 ? editingUrl.split('youtu.be/')[1] : editingUrl
                     }
                   })()
                   if (!currentId) {

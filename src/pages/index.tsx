@@ -7,14 +7,14 @@ import { RoadmapCard } from 'components/RoadmapCard'
 import { request } from 'schemaHelper'
 import dayjs from 'dayjs'
 import { Header } from 'components/Header'
-import { auth } from 'services/firebase'
+
 const Home: NextPage = () => {
   const [tab, setTab] = useState(0)
-  const { data } = useQuery('/home_timeline', () =>
+  const { data } = useQuery(['/home_timeline'], () =>
     request({ url: '/home_timeline', method: 'get' }).then(({ data }) => data)
   )
 
-  const { data: recommendData } = useQuery('/recommend/roadmaps', () =>
+  const { data: recommendData } = useQuery(['/recommend/roadmaps'], () =>
     request({ url: '/recommend/roadmaps', method: 'get' }).then(({ data }) => data)
   )
 

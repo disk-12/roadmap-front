@@ -7,21 +7,19 @@ import { RoadmapCard } from 'components/RoadmapCard'
 import dayjs from 'dayjs'
 import { NextPage } from 'next'
 import { useState } from 'react'
-import { useMutation } from 'react-query'
-import { components } from 'schema'
+import { useQuery } from 'react-query'
 import { request } from 'schemaHelper'
+import { components } from 'schema'
 
 const SearchPage: NextPage = () => {
   const [searchText, setSearchText] = useState('')
-  const [data, setData] = useState<components['schemas']['Roadmap'][]>([])
-
-  const { mutate } = useMutation<unknown, unknown, string>(
-    (params) =>
-      request<'/search/roadmaps/{keyword}', 'get'>(
-        { url: '/search/roadmaps/{keyword}', method: 'get' },
-        { '{keyword}': params }
-      ).then(({ data }) => data),
-    { onSuccess: (d) => setData(d as components['schemas']['Roadmap'][]) }
+  const { data = [], refetch } = useQuery(
+    ['/search/roadmaps/{keyword}', { searchText }],
+    () =>
+      request({ url: '/search/roadmaps/{keyword}', method: 'get' }, { '{keyword}': searchText }).then(
+        ({ data }) => data as components['schemas']['Roadmap'][]
+      ),
+    { enabled: false }
   )
 
   return (
@@ -37,12 +35,12 @@ const SearchPage: NextPage = () => {
             fullWidth
             onChange={({ target }) => setSearchText(target.value)}
           />
-          <Button onClick={() => mutate(searchText)} color='primary' variant='contained' disabled={searchText === ''}>
+          <Button onClick={() => refetch()} color='primary' variant='contained' disabled={searchText === ''}>
             <FontAwesomeIcon icon={faSearch} />
           </Button>
         </Box>
       </Box>
-      <Box flexGrow={1} display='flex' flexDirection='column'>
+      <Box flexGrow={1} display='flex' flexDirection='column' my={1}>
         {data.map((e) => (
           <RoadmapCard
             key={e.id}

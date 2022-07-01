@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogTitle, Divider, Tab, Tabs, Typography } from '@mui/material'
+import { Box, Tab, Tabs, Typography } from '@mui/material'
 import { Header } from 'components/Header'
 import { RoadmapCard } from 'components/RoadmapCard'
 import { UserContext } from 'context'
@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { FC, useContext, useState } from 'react'
-import { useMutation, useQuery } from 'react-query'
+import { useQuery } from 'react-query'
 import { request } from 'schemaHelper'
 
 const MyPage: NextPage = () => {
@@ -34,7 +34,7 @@ const MyPage: NextPage = () => {
 }
 
 const MyList: FC<{ userId?: string }> = ({ userId }) => {
-  const { data = [], isLoading } = useQuery('/users/{author_id}/roadmaps', () =>
+  const { data = [], isLoading } = useQuery(['/users/{author_id}/roadmaps'], () =>
     typeof userId === 'string'
       ? request({ url: '/users/{author_id}/roadmaps', method: 'get' }, { '{author_id}': userId }).then(
           ({ data }) => data
@@ -68,7 +68,7 @@ const MyList: FC<{ userId?: string }> = ({ userId }) => {
 }
 
 const FavList: FC = () => {
-  const { data = [], isLoading } = useQuery('/favorites', () =>
+  const { data = [], isLoading } = useQuery(['/favorites'], () =>
     request({ url: '/favorites', method: 'get' }).then(({ data }) => data)
   )
   if (isLoading) return <></>
@@ -93,7 +93,7 @@ const FavList: FC = () => {
 }
 
 const HistoryList: FC = () => {
-  const { data = [], isLoading } = useQuery('/histories', () =>
+  const { data = [], isLoading } = useQuery(['/histories'], () =>
     request({ url: '/histories', method: 'get' }).then(({ data }) => data)
   )
   // const [modalId, setModalId] = useState<string>()
