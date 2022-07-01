@@ -16,10 +16,10 @@ const AnonymousLogin: NextPage = () => {
   const signInAnonymouslyHundler = () => {
     signInAnonymously(auth)
       .then(() => {
-        setToken()
-        if (!usernameRef.current?.value) axios.post('/user', { name: 'no name' }).then(({ data }) => data)
-        else axios.post('/user', { name: usernameRef.current?.value }).then(({ data }) => data)
-        router.push('/my')
+        setToken().then(() => {
+          axios.post('/user', { name: usernameRef.current?.value }).then(({ data }) => data)
+          router.push('/my')
+        })
       })
       .catch((error: any) => {
         if (error instanceof FirebaseError) {
