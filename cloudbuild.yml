@@ -5,8 +5,8 @@ steps:
     args:
       - -c
       - |
-        echo $_ENV -e
-        echo $_ENV -e > .env
+        echo "$_ENV" -e
+        echo "$_ENV" -e > .env
         cat .env
   - id: build_frontend
     name: 'gcr.io/cloud-builders/docker'
