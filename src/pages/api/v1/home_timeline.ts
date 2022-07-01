@@ -12,6 +12,7 @@ const dummyData: ResponseData<'/home_timeline', 'get'> = [
     locked: false,
     created_at: '',
     updated_at: '',
+    thumbnail: 'ncI1wORn9F4',
     edges: [
       {
         id: '1',
