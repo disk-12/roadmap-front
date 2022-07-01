@@ -51,7 +51,7 @@ export const ReadNodeModal: FC<{
         </Box>
         <Box justifyContent='flex-end' display='flex' p={1}>
           {modalData.achieved ? (
-            <Button disabled variant='contained' color="success">
+            <Button disabled variant='contained' color='success'>
               学習済み
             </Button>
           ) : (
@@ -139,12 +139,28 @@ export const EditNodeModal: FC<{
               <TextField
                 value={editingUrl}
                 onChange={({ target }) => setEditingUrl(target.value)}
-                placeholder='動画IDを入力'
+                placeholder='youtubeの url または 動画ID を入力'
                 variant='outlined'
                 size='small'
                 fullWidth
               />
-              <IconButton onClick={() => setModalData({ ...modalData, youtube_id: editingUrl })}>
+              <IconButton
+                onClick={() => {
+                  const currentId = (() => {
+                    try {
+                      return new URL(editingUrl).searchParams.get('v')
+                    } catch (_) {
+                      return editingUrl
+                    }
+                  })()
+                  if (!currentId) {
+                    setEditingUrl('')
+                    return
+                  }
+                  setEditingUrl(currentId)
+                  setModalData({ ...modalData, youtube_id: currentId })
+                }}
+              >
                 <FontAwesomeIcon icon={faSearch} />
               </IconButton>
             </Box>
@@ -154,7 +170,7 @@ export const EditNodeModal: FC<{
                 onChange={({ target }) =>
                   setModalData(() => ({
                     ...modalData,
-                    from_sec: target.value === '' ? 0 : Number(target.value),
+                    youtube_start: target.value === '' ? 0 : Number(target.value),
                   }))
                 }
                 fullWidth
@@ -168,7 +184,7 @@ export const EditNodeModal: FC<{
                 onChange={({ target }) =>
                   setModalData(() => ({
                     ...modalData,
-                    to_sec: target.value === '' ? 0 : Number(target.value),
+                    youtube_end: target.value === '' ? 0 : Number(target.value),
                   }))
                 }
                 fullWidth
