@@ -147,10 +147,11 @@ export const EditNodeModal: FC<{
               <IconButton
                 onClick={() => {
                   const currentId = (() => {
+                    if (editingUrl.split('youtu.be/').length === 2) return editingUrl.split('youtu.be/')[1]
                     try {
                       return new URL(editingUrl).searchParams.get('v')
                     } catch (_) {
-                      return editingUrl.split('youtu.be/').length === 2 ? editingUrl.split('youtu.be/')[1] : editingUrl
+                      return editingUrl
                     }
                   })()
                   if (!currentId) {
@@ -210,13 +211,13 @@ export const EditNodeModal: FC<{
               />
               <IconButton
                 onClick={() =>
-                  refetch().then(() =>
+                  refetch().then(({ data }) =>
                     setModalData({
                       ...modalData,
                       link: editingUrl,
-                      ogp_image: ogp?.image,
-                      ogp_title: ogp?.title,
-                      ogp_site_name: ogp?.siteName,
+                      ogp_image: data?.image,
+                      ogp_title: data?.title,
+                      ogp_site_name: data?.siteName,
                     })
                   )
                 }

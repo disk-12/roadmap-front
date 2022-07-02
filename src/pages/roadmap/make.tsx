@@ -62,7 +62,10 @@ const MakeRoadmap: NextPage = () => {
           <Box color='red' fontSize='xx-small' display='flex' flexDirection='column' gap={0.25}>
             {roadmapData.title === '' && <Typography>* タイトルを入力してください</Typography>}
             {vertexList.length === 0 && <Typography>* ノードを追加してください</Typography>}
-            {vertexList.some((e) => e.title === '') && <Typography>* 編集不足のノードがあります</Typography>}
+            {vertexList.some(
+              (e) =>
+                e.title === '' || (e.type === 'LINK' && e.link === '') || (e.type === 'YOUTUBE' && e.youtube_id === '')
+            ) && <Typography>* 編集不足のノードがあります</Typography>}
           </Box>
           <TextField
             placeholder='ロードマップのタイトルを入力'
@@ -122,14 +125,21 @@ const MakeRoadmap: NextPage = () => {
                   vertexes: vertexList,
                   locked: isLock,
                   thumbnail: (() => {
-                    const v = vertexList.find(({ type }) => type === 'YOUTUBE')
+                    const v = vertexList.find((e) => e.type === 'YOUTUBE' && e.youtube_id !== '')
                     return v?.type === 'YOUTUBE' ? v.youtube_id : undefined
                   })(),
                 })
               }
               fullWidth
               disabled={
-                roadmapData.title === '' || vertexList.length === 0 || vertexList.some(({ title }) => title === '')
+                roadmapData.title === '' ||
+                vertexList.length === 0 ||
+                vertexList.some(
+                  (e) =>
+                    e.title === '' ||
+                    (e.type === 'LINK' && e.link === '') ||
+                    (e.type === 'YOUTUBE' && e.youtube_id === '')
+                )
               }
             >
               投稿する

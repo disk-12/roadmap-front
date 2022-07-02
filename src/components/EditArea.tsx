@@ -174,7 +174,7 @@ export const EditArea: FC<EditAreaProps> = ({
                 p={1}
                 isActive={
                   e.title !== '' &&
-                  ((e.type === 'YOUTUBE' && e.id !== '') ||
+                  ((e.type === 'YOUTUBE' && e.youtube_id !== '') ||
                     (e.type === 'LINK' && e.link !== '') ||
                     e.type === 'DEFAULT')
                 }

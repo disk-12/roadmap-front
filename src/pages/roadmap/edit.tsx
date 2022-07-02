@@ -64,7 +64,10 @@ const EditRoadMap: NextPage<PageProps> = ({ data, id }) => {
         <Box bgcolor='#f5f5f5' p={2} display='flex' flexDirection='column' gap={2}>
           <Box color='red' fontSize='xx-small' display='flex' flexDirection='column' gap={0.25}>
             {vertexList.length === 0 && <Typography>* ノードを追加してください</Typography>}
-            {vertexList.some((e) => e.title === '') && <Typography>* 編集不足のノードがあります</Typography>}
+            {vertexList.some(
+              (e) =>
+                e.title === '' || (e.type === 'LINK' && e.link === '') || (e.type === 'YOUTUBE' && e.youtube_id === '')
+            ) && <Typography>* 編集不足のノードがあります</Typography>}
           </Box>
           <Typography>{roadmapData.title}</Typography>
           <Box display='flex' gap={1} alignItems='center'>
@@ -112,14 +115,21 @@ const EditRoadMap: NextPage<PageProps> = ({ data, id }) => {
                   vertexes: vertexList,
                   locked: false,
                   thumbnail: (() => {
-                    const v = vertexList.find(({ type }) => type === 'YOUTUBE')
+                    const v = vertexList.find((e) => e.type === 'YOUTUBE' && e.youtube_id !== '')
                     return v?.type === 'YOUTUBE' ? v.youtube_id : undefined
                   })(),
                 })
               }
               fullWidth
               disabled={
-                roadmapData.title === '' || vertexList.length === 0 || vertexList.some(({ title }) => title === '')
+                roadmapData.title === '' ||
+                vertexList.length === 0 ||
+                vertexList.some(
+                  (e) =>
+                    e.title === '' ||
+                    (e.type === 'LINK' && e.link === '') ||
+                    (e.type === 'YOUTUBE' && e.youtube_id === '')
+                )
               }
             >
               編集完了
