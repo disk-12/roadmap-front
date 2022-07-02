@@ -161,7 +161,9 @@ export const EditArea: FC<EditAreaProps> = ({
           <Draggable
             position={{ x: e.x_coordinate, y: e.y_coordinate }}
             onDrag={onDragHandler}
-            onStop={(_, data) => onStopHandler(e, data)}
+            onStop={(ev, data) => {
+              onStopHandler(e, data)
+            }}
             key={e.id}
           >
             <Box zIndex={10} sx={{ position: 'absolute' }}>

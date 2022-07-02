@@ -12,7 +12,7 @@ import { request, ResponseData } from 'schemaHelper'
 import { LottieModal } from 'components/LottieModal'
 import { ReadNodeModal } from 'components/NodeModal'
 import { Header } from 'components/Header'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import dayjs from 'dayjs'
 import { TwitterShareButton } from 'react-share'
 import { faTwitter } from '@fortawesome/free-brands-svg-icons'
@@ -36,12 +36,17 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
       request(
         { url: '/roadmaps/{roadmap_id}/vertex/{vertex_id}/achievement', method: 'post' },
         { '{roadmap_id}': id, '{vertex_id}': param }
-      ).then(({ data }) => data),
+      ).then(({ data }) => console.log(data)),
     {
       onSuccess: () =>
         refetch().then(() => {
           setModalData(undefined)
         }),
+      onError: (e) => {
+        if (e instanceof AxiosError && e.request.status) {
+          router.push('/signin')
+        }
+      },
     }
   )
 
@@ -53,6 +58,11 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
       ),
     {
       onSuccess: () => refetch(),
+      onError: (e) => {
+        if (e instanceof AxiosError && e.request.status) {
+          router.push('/signin')
+        }
+      },
     }
   )
 
@@ -64,6 +74,11 @@ const RoadmapPage: NextPage<PageProps> = ({ data: defaultData, id }) => {
       ),
     {
       onSuccess: () => refetch(),
+      onError: (e) => {
+        if (e instanceof AxiosError && e.request.status) {
+          router.push('/signin')
+        }
+      },
     }
   )
 
